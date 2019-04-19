@@ -1,0 +1,54 @@
+%%%%%%%%%%%%%%%% RECURSIVE TRAVERSAL (DIR) %%%%%%%%%%%%%
+\begin{algorithm}
+\begin{small}
+\SetCommentSty{emph}
+
+\SetKwData{near}{near}
+\SetKwData{far}{far}
+\SetKwData{currentnode}{current node}
+\SetKwData{entrydistance}{entry distance}
+\SetKwData{exitdistance}{exit distance}
+\SetKwData{tree}{tree}
+\SetKwData{split}{t}
+\SetKwData{ray}{ray}
+\SetKwFunction{kdrec}{Kd-tree Recursive Traversal}
+
+%\DontPrintSemicolon\kdrec:\;\PrintSemicolon
+\Begin {
+  (\entrydistance, \exitdistance) $\leftarrow$ intersect \ray with root's AABB\;
+  push ( \tree root node, \entrydistance, \exitdistance ) to stack \;
+  \While{stack is not empty}{
+    (\currentnode, \entrydistance, \exitdistance) $\leftarrow$ pop stack\;
+    \While{\currentnode is not a leaf}{
+      a $\leftarrow$ \currentnode 's split axis\;
+      \split $\leftarrow$ (\currentnode 's split value.a - \ray origin.a) / \ray dir.a\;
+      
+      (\near, \far) $\leftarrow$ classify near/far with (split value.a $>$ ray origin.a)
+      
+      \uIf{\split $\geq$ \exitdistance or \split $<$ 0}{
+        \currentnode $\leftarrow$ \near\;
+      }
+      \uElseIf{\split $\leq$ \entrydistance}{
+        \currentnode $\leftarrow$ \far\;
+      }
+      \Else{
+        push ( \far, \split, \exitdistance ) to stack\;
+        \currentnode $\leftarrow$ \near\;
+        \exitdistance $\leftarrow$ \split\;
+      }
+    }
+    \If{\currentnode is not empty leaf} {
+      intersect ray with each object\;
+      \If{any intersection exists inside the leaf}
+      {
+        \Return closest object to the ray origin\;
+      }
+    }	
+  }	
+  \Return no object intersected\;
+}
+\end{small}
+\caption{\label{pseudo-code-rec}Recursive traversal based on ray origin classification.
+  For direction based classification change line 10 to use (ray dir.a $>$ 0) and
+  remove condition (t $<$ 0) from line 11.}
+\end{algorithm}
