@@ -31,13 +31,18 @@ Object::Object(const std::string& fileName):
 		vertices[i].normal = {0,0,0};
 		_aabb.unite(vertices[i].position);
 	}
-	std::vector<unsigned int> indices(objData.faceCount*3);
+	std::vector<PrimitiveInfo> primitivesInfo(objData.faceCount);
 	for(int i = 0; i < objData.faceCount; ++i) {
 		obj_face& face = (*objData.faceList[i]);
 		assert(face.vertex_count == 3);
-		indices[i*3+0] = face.vertex_index[0];
-		indices[i*3+1] = face.vertex_index[1];
-		indices[i*3+2] = face.vertex_index[2];
+		primitivesInfo[i].indices[0] = face.vertex_index[0];
+		primitivesInfo[i].indices[1] = face.vertex_index[1];
+		primitivesInfo[i].indices[2] = face.vertex_index[2];
+		primitivesInfo[i].centroid = (
+				vertices[face.vertex_index[0]].position +
+				vertices[face.vertex_index[1]].position +
+				vertices[face.vertex_index[2]].position
+				)/3.f;
 		const obj_vector& n0 = *objData.normalList[face.normal_index[0]];
 		const obj_vector& n1 = *objData.normalList[face.normal_index[1]];
 		const obj_vector& n2 = *objData.normalList[face.normal_index[2]];
@@ -48,6 +53,16 @@ Object::Object(const std::string& fileName):
 	_triangleCount = objData.faceCount;
 	for(Vertex& v : vertices)
 		v.normal = glm::normalize(v.normal);
+
+	const unsigned MAX_PRIMITIVES_IN_LEAF = 100000;
+	std::vector<unsigned> primitiveOrder = _bvh.build(vertices, primitivesInfo, MAX_PRIMITIVES_IN_LEAF);
+	std::vector<unsigned int> indices(objData.faceCount*3);
+	for(unsigned i = 0; i < primitiveOrder.size(); ++i) {
+		unsigned primID = primitiveOrder[i];
+		indices[i*3+0] = primitivesInfo[primID].indices[0];
+		indices[i*3+1] = primitivesInfo[primID].indices[1];
+		indices[i*3+2] = primitivesInfo[primID].indices[2];
+	}
 
 	if(objData.materialCount >= 1) {
 		obj_material& om = *objData.materialList[0];

@@ -2,6 +2,7 @@
 #define OBJECT_HPP_19_04_21_09_20_37 
 #include <string>
 #include "types.hpp"
+#include "bvh.hpp"
 
 class Object {
 	friend class Scene;
@@ -35,6 +36,7 @@ class Object {
 		double _drawTime;
 		bool _queryActive;
 		AABB _aabb;
+		BVH _bvh;
 
 		virtual void draw(bool doTimerQuery = false);
 };
