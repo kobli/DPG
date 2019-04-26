@@ -127,6 +127,10 @@ unsigned Object::getRenderedTriangleCount() const {
 	return _renderedTriangleCount;
 }
 
+unsigned Object::getTriangleCount() const {
+	return _triangleCount;
+}
+
 glm::mat4 Object::getTransform() const {
 	return _transform;
 }
@@ -161,5 +165,12 @@ void Object::draw(const std::vector<Plane>& frustumPlanes, bool doTimerQuery) {
 }
 
 void Object::doDrawing(const std::vector<Plane>& frustumPlanes) {
-	glDrawElements(GL_TRIANGLES, _triangleCount*3, GL_UNSIGNED_INT, (void*)0);
+	std::vector<unsigned> visibleNodes = _bvh.nodesInFrustum(frustumPlanes);
+	const std::vector<NodePrimitives>& nodePrimitives = _bvh.getNodePrimitiveRanges();
+	_renderedTriangleCount = 0;
+	std::cout << "Visible node count: " << visibleNodes.size() << std::endl;
+	for(const unsigned& nID: visibleNodes) {
+		glDrawElements(GL_TRIANGLES, nodePrimitives[nID].count*3, GL_UNSIGNED_INT, BUFFER_OFFSET(sizeof(unsigned)*3*nodePrimitives[nID].first));
+		_renderedTriangleCount += nodePrimitives[nID].count;
+	}
 }

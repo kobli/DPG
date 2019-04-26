@@ -11,6 +11,7 @@ class Scene {
 		Object& addObject(const std::string& fileName);
 		float totalObjectGPUDrawTime() const;
 		unsigned totalObjectTrianglesRendered() const;
+		unsigned triangleCount() const;
 		Camera& getCamera();
 
 	private:

@@ -21,6 +21,7 @@ class Object {
 		glm::vec3 getPosition() const;
 		double getDrawTime() const;
 		unsigned getRenderedTriangleCount() const;
+		unsigned getTriangleCount() const;
 		glm::mat4 getTransform() const;
 		Material& getMaterial();
 		const AABB& getAABB() const;

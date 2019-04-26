@@ -4,6 +4,12 @@
 #include <memory>
 #include "types.hpp"
 
+enum ContainmentType {
+	Inside,
+	Intersecting,
+	Outside
+};
+
 struct PrimitiveInfo {
 	unsigned indices[3];
 	glm::vec3 centroid;
@@ -15,6 +21,11 @@ inline void normalizePlane(Plane& p) {
 	float l = glm::length(glm::vec3(p));
 	p /= l;
 }
+
+struct NodePrimitives {
+	unsigned first;
+	unsigned count;
+};
 
 class BVH {
 	struct BVHBuildNode {
@@ -31,17 +42,13 @@ class BVH {
 		uint8_t firstFrustumTestPlane;
 	};
 
-	struct NodePrimitives {
-		unsigned first;
-		unsigned count;
-	};
-
 	//TODO test different size - unaligned cache lines
 	static_assert(sizeof(BVHNode) == 32, "");
 
 	public:
 	std::vector<unsigned> build(const std::vector<Vertex>& vertices, const std::vector<PrimitiveInfo>& primitivesInfo, unsigned maxPrimitivesInLeaf);
 	const std::vector<unsigned>& nodesInFrustum(const std::vector<Plane>& frustumPlanes);
+	const std::vector<NodePrimitives>& getNodePrimitiveRanges() const;
 
 	private:
 		void compress(BVHBuildNode&& root);

@@ -131,6 +131,7 @@ void Application::displayStats() {
 	stringstream ss;
 	ss << "FPS: " << int(1/_frameTime) << endl;
 	ss << "Draw time [ms]: " << _scene->totalObjectGPUDrawTime() << endl;
+	ss << "Triangles rendered / total: " << _scene->totalObjectTrianglesRendered() << " / " << _scene->triangleCount() << endl;
 	_fr->RenderText(ss.str(), 10, 100, 0.4, {1,0,0});
 }
 

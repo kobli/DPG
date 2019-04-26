@@ -60,6 +60,13 @@ unsigned Scene::totalObjectTrianglesRendered() const {
 	return triCount;
 }
 
+unsigned Scene::triangleCount() const {
+	unsigned triCount = 0;
+	for(const Object& o : _objects)
+		triCount += o.getTriangleCount();
+	return triCount;
+}
+
 Camera& Scene::getCamera() {
 	return _camera;
 }
