@@ -106,6 +106,7 @@ void BVH::compress(BVHBuildNode&& root) {
 	nodes.push(&root);
 	_nodes.emplace_back();
 	_nodes.back().bounds = root.bounds;
+	_nodePrimitives.push_back({root.firstPrimitive, root.primitiveCount});
 	root.compressedNodeI = 0;
 	while(!nodes.empty()) {
 		BVHBuildNode* n = nodes.top();
