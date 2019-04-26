@@ -42,12 +42,18 @@ ContainmentType AAboxInPlane(const AABB& box, const Plane& plane) {
 }
 
 ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes) {
+	bool intersecting = false;
 	for(const Plane& p : planes) {
 		ContainmentType c = AAboxInPlane(box, p);
-		if(c != ContainmentType::Inside)
-			return c;
+		if(c == ContainmentType::Outside)
+			return ContainmentType::Outside;
+		else if(c == ContainmentType::Intersecting)
+			intersecting = true;
 	}
-	return ContainmentType::Inside;
+	if(intersecting)
+		return ContainmentType::Intersecting;
+	else
+		return ContainmentType::Inside;
 }
 
 std::vector<unsigned> BVH::build(const std::vector<Vertex>& vertices, const std::vector<PrimitiveInfo>& primitivesInfo, unsigned maxPrimitivesInLeaf) {
@@ -159,34 +165,32 @@ void BVH::primitivesAndCentroidsAABB(
 const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frustumPlanes) {
 	static std::vector<unsigned> nodesInFrustum;
 	nodesInFrustum.clear();
+	std::stack<unsigned> forward;
+	auto goForward = [&](unsigned& nID)->bool {
+		while(!forward.empty() && forward.top() <= nID && forward.top() != unsigned(-1))
+			forward.pop();
+		if(forward.empty())
+			return false;
+		nID = forward.top();
+		forward.pop();
+		return true;
+	};
 	for(unsigned nID = 0; nID < _nodes.size(); ) {
 		ContainmentType boxFrustumCont = AAboxInPlanes(_nodes[nID].bounds, frustumPlanes);
 		if(boxFrustumCont == ContainmentType::Inside) {
 			nodesInFrustum.push_back(nID);
-			if(nID != 0) {
-				unsigned nextNodeID = _nodes[nID-1].rightChild;
-				if(nID == nextNodeID) // we already are in the right subtree
-					break;
-				else
-					nID = nextNodeID;
-			}
-			else // the root (and the entire BVH) is inside the frustum
+			if(!goForward(nID))
 				break;
 		}
 		else if(boxFrustumCont == ContainmentType::Intersecting) {
 			if(_nodes[nID].rightChild == nID+1 || _nodes[nID].rightChild == unsigned(-1)) // the current node is a leaf
 				nodesInFrustum.push_back(nID);
+			else
+				forward.push(_nodes[nID].rightChild);
 			++nID;
 		}
 		else if(boxFrustumCont == ContainmentType::Outside) {
-			if(nID != 0) {
-				unsigned nextNodeID = _nodes[nID-1].rightChild;
-				if(nID == nextNodeID) // we already are in the right subtree
-					break;
-				else
-					nID = nextNodeID;
-			}
-			else // the root (and the entire BVH) is outside the frustum
+			if(!goForward(nID))
 				break;
 		}
 		else {

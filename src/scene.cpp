@@ -76,18 +76,12 @@ Camera& Scene::getCamera() {
 std::vector<Plane> Scene::viewFrustumPlanesFromProjMat(const glm::mat4& mat) {
 	using namespace glm;
 	std::vector<Plane> planes(6);
-	// Left clipping plane
-	planes[0] = row(mat,3) + row(mat,0);
-	// Right clipping plane
-	planes[1] = row(mat,3) - row(mat,0);
-	// Bottom clipping plane
-	planes[2] = row(mat,3) + row(mat,1);
-	// Top clipping plane
-	planes[3] = row(mat,3) - row(mat,1);
-	// Near clipping plane
-	planes[4] = row(mat,3) + row(mat,2);
-	// Far clipping plane
-	planes[4] = row(mat,3) - row(mat,2);
+	planes[0] = row(mat,3) + row(mat,0); // Left clipping plane
+	planes[1] = row(mat,3) - row(mat,0); // Right clipping plane
+	planes[2] = row(mat,3) + row(mat,1); // Bottom clipping plane
+	planes[3] = row(mat,3) - row(mat,1); // Top clipping plane
+	planes[4] = row(mat,3) + row(mat,2); // Near clipping plane
+	planes[5] = row(mat,3) - row(mat,2); // Far clipping plane
 	// Normalize the plane equations
 	for(Plane& p : planes)
 		normalizePlane(p);
