@@ -54,7 +54,7 @@ Object::Object(const std::string& fileName):
 	for(Vertex& v : vertices)
 		v.normal = glm::normalize(v.normal);
 
-	const unsigned MAX_PRIMITIVES_IN_LEAF = 100000;
+	const unsigned MAX_PRIMITIVES_IN_LEAF = 10000;
 	std::vector<unsigned> primitiveOrder = _bvh.build(vertices, primitivesInfo, MAX_PRIMITIVES_IN_LEAF);
 	std::vector<unsigned int> indices(objData.faceCount*3);
 	for(unsigned i = 0; i < primitiveOrder.size(); ++i) {
@@ -168,7 +168,6 @@ void Object::doDrawing(const std::vector<Plane>& frustumPlanes) {
 	std::vector<unsigned> visibleNodes = _bvh.nodesInFrustum(frustumPlanes);
 	const std::vector<NodePrimitives>& nodePrimitives = _bvh.getNodePrimitiveRanges();
 	_renderedTriangleCount = 0;
-	std::cout << "Visible node count: " << visibleNodes.size() << std::endl;
 	for(const unsigned& nID: visibleNodes) {
 		glDrawElements(GL_TRIANGLES, nodePrimitives[nID].count*3, GL_UNSIGNED_INT, BUFFER_OFFSET(sizeof(unsigned)*3*nodePrimitives[nID].first));
 		_renderedTriangleCount += nodePrimitives[nID].count;
