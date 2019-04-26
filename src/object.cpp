@@ -123,6 +123,10 @@ double Object::getDrawTime() const {
 	return _drawTime;
 }
 
+unsigned Object::getRenderedTriangleCount() const {
+	return _renderedTriangleCount;
+}
+
 glm::mat4 Object::getTransform() const {
 	return _transform;
 }
@@ -135,7 +139,7 @@ const AABB& Object::getAABB() const {
 	return _aabb;
 }
 
-void Object::draw(bool doTimerQuery) {
+void Object::draw(const std::vector<Plane>& frustumPlanes, bool doTimerQuery) {
 	glBindVertexArray(_vao);
 	GLuint64 qr = GL_FALSE;
 	if(_queryActive && doTimerQuery)
@@ -148,11 +152,14 @@ void Object::draw(bool doTimerQuery) {
 	}
 	if(!_queryActive && doTimerQuery) {
 		glBeginQuery(GL_TIME_ELAPSED, _queryID);
-		glDrawElements(GL_TRIANGLES, _triangleCount*3, GL_UNSIGNED_INT, (void*)0);
+		doDrawing(frustumPlanes);
 		glEndQuery(GL_TIME_ELAPSED);
 		_queryActive = true;
 	}
 	else
-		glDrawElements(GL_TRIANGLES, _triangleCount*3, GL_UNSIGNED_INT, (void*)0);
+		doDrawing(frustumPlanes);
+}
 
+void Object::doDrawing(const std::vector<Plane>& frustumPlanes) {
+	glDrawElements(GL_TRIANGLES, _triangleCount*3, GL_UNSIGNED_INT, (void*)0);
 }

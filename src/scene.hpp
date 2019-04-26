@@ -10,9 +10,12 @@ class Scene {
 		void render();
 		Object& addObject(const std::string& fileName);
 		float totalObjectGPUDrawTime() const;
+		unsigned totalObjectTrianglesRendered() const;
 		Camera& getCamera();
 
 	private:
+		std::vector<Plane> viewFrustumPlanesFromProjMat(const glm::mat4& proj);
+
 		std::vector<Object> _objects;
 		Camera _camera;
 		GLuint _program;

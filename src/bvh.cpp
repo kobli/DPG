@@ -107,3 +107,10 @@ void BVH::primitivesAndCentroidsAABB(
 	}
 }
 
+const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frustumPlanes) {
+	static std::vector<unsigned> nodesInFrustum;
+	nodesInFrustum.clear();
+	//TODO
+	return nodesInFrustum;
+}
+

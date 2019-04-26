@@ -1,5 +1,6 @@
 #include <iostream>
 #include <GL/glew.h>
+#include <glm/gtc/matrix_access.hpp>
 #include "scene.hpp"
 #include "utils.hpp"
 
@@ -35,7 +36,8 @@ void Scene::render() {
 		glUniform1f(glGetUniformLocation(_program, "Mat.specularK"), m.specularK);
 		glUniform1f(glGetUniformLocation(_program, "Mat.shininess"), m.shininess);
 
-		o.draw(true);
+		glm::mat4 mvp = _camera.getViewProjection()*o.getTransform();
+		o.draw(viewFrustumPlanesFromProjMat(mvp), true);
 	}
 }
 
@@ -51,6 +53,36 @@ float Scene::totalObjectGPUDrawTime() const {
 	return drawTime;
 }
 
+unsigned Scene::totalObjectTrianglesRendered() const {
+	unsigned triCount = 0;
+	for(const Object& o : _objects)
+		triCount += o.getRenderedTriangleCount();
+	return triCount;
+}
+
 Camera& Scene::getCamera() {
 	return _camera;
+}
+
+// see article from Gribb and Hartmann:
+// Fast Extraction of Viewing Frustum Planes from the WorldView-Projection Matrix
+std::vector<Plane> Scene::viewFrustumPlanesFromProjMat(const glm::mat4& mat) {
+	using namespace glm;
+	std::vector<Plane> planes(6);
+	// Left clipping plane
+	planes[0] = row(mat,3) + row(mat,0);
+	// Right clipping plane
+	planes[1] = row(mat,3) - row(mat,0);
+	// Bottom clipping plane
+	planes[2] = row(mat,3) + row(mat,1);
+	// Top clipping plane
+	planes[3] = row(mat,3) - row(mat,1);
+	// Near clipping plane
+	planes[4] = row(mat,3) + row(mat,2);
+	// Far clipping plane
+	planes[4] = row(mat,3) - row(mat,2);
+	// Normalize the plane equations
+	for(Plane& p : planes)
+		normalizePlane(p);
+	return planes;
 }

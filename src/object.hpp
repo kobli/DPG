@@ -20,6 +20,7 @@ class Object {
 		void setPosition(glm::vec3 pos);
 		glm::vec3 getPosition() const;
 		double getDrawTime() const;
+		unsigned getRenderedTriangleCount() const;
 		glm::mat4 getTransform() const;
 		Material& getMaterial();
 		const AABB& getAABB() const;
@@ -34,11 +35,13 @@ class Object {
 		glm::mat4 _transform;
 		Material _material;
 		double _drawTime;
+		unsigned _renderedTriangleCount;
 		bool _queryActive;
 		AABB _aabb;
 		BVH _bvh;
 
-		virtual void draw(bool doTimerQuery = false);
+		virtual void draw(const std::vector<Plane>& frustumPlanes, bool doTimerQuery = false);
+		void doDrawing(const std::vector<Plane>& frustumPlanes);
 };
 
 #endif /* OBJECT_HPP_19_04_21_09_20_37 */

@@ -9,10 +9,12 @@ struct PrimitiveInfo {
 	glm::vec3 centroid;
 };
 
-struct Plane {
-	glm::vec3 n;
-	float d;
-};
+using Plane = glm::vec4;
+
+inline void normalizePlane(Plane& p) {
+	float l = glm::length(glm::vec3(p));
+	p /= l;
+}
 
 class BVH {
 	struct BVHBuildNode {
@@ -39,7 +41,7 @@ class BVH {
 
 	public:
 	std::vector<unsigned> build(const std::vector<Vertex>& vertices, const std::vector<PrimitiveInfo>& primitivesInfo, unsigned maxPrimitivesInLeaf);
-		const std::vector<unsigned>& nodesInFrustum(const std::vector<Plane>& frustumPlanes);
+	const std::vector<unsigned>& nodesInFrustum(const std::vector<Plane>& frustumPlanes);
 
 	private:
 		void compress(BVHBuildNode&& root);
