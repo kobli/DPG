@@ -4,23 +4,10 @@
 #include <memory>
 #include "types.hpp"
 
-enum ContainmentType {
-	Inside,
-	Intersecting,
-	Outside
-};
-
 struct PrimitiveInfo {
 	unsigned indices[3];
 	glm::vec3 centroid;
 };
-
-using Plane = glm::vec4;
-
-inline void normalizePlane(Plane& p) {
-	float l = glm::length(glm::vec3(p));
-	p /= l;
-}
 
 struct NodePrimitives {
 	unsigned first;

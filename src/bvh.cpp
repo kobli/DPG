@@ -1,60 +1,7 @@
 #include <stack>
 #include <algorithm>
 #include "bvh.hpp"
-
-ContainmentType pointInPlane(const glm::vec3& point, const Plane& plane) {
-	float d = glm::dot(glm::vec4(point, 1), plane);
-	if(d == 0)
-		return ContainmentType::Intersecting;
-	else if(d > 0)
-		return ContainmentType::Inside;
-	else
-		return ContainmentType::Outside;
-}
-
-ContainmentType AAboxInPlane(const AABB& box, const Plane& plane) {
-	std::vector<glm::vec3> vertices{
-		box.min,
-		{box.max.x, box.min.y, box.min.z},
-		{box.min.x, box.max.y, box.min.z},
-		{box.max.x, box.max.y, box.min.z},
-		box.max,
-		{box.max.x, box.min.y, box.max.z},
-		{box.min.x, box.max.y, box.max.z},
-		{box.max.x, box.max.y, box.max.z},
-	};
-
-	bool someInside = false;
-	bool someOutside = false;
-	for(const glm::vec3& v : vertices) {
-		ContainmentType c = pointInPlane(v, plane);
-		if(c == ContainmentType::Inside)
-			someInside = true;
-		else if(c == ContainmentType::Outside)
-			someOutside = true;
-	}
-	if(!someInside)
-		return ContainmentType::Outside;
-	else if(!someOutside)
-		return ContainmentType::Inside;
-	else
-		return ContainmentType::Intersecting;
-}
-
-ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes) {
-	bool intersecting = false;
-	for(const Plane& p : planes) {
-		ContainmentType c = AAboxInPlane(box, p);
-		if(c == ContainmentType::Outside)
-			return ContainmentType::Outside;
-		else if(c == ContainmentType::Intersecting)
-			intersecting = true;
-	}
-	if(intersecting)
-		return ContainmentType::Intersecting;
-	else
-		return ContainmentType::Inside;
-}
+#include "containment.hpp"
 
 std::vector<unsigned> BVH::build(const std::vector<Vertex>& vertices, const std::vector<PrimitiveInfo>& primitivesInfo, unsigned maxPrimitivesInLeaf) {
 	std::vector<unsigned> primitives(primitivesInfo.size());
@@ -166,6 +113,7 @@ const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frust
 	static std::vector<unsigned> nodesInFrustum;
 	nodesInFrustum.clear();
 	std::stack<unsigned> forward;
+	AAboxInPlanesTester_conservative aabbTester(frustumPlanes);
 	auto goForward = [&](unsigned& nID)->bool {
 		while(!forward.empty() && forward.top() <= nID && forward.top() != unsigned(-1))
 			forward.pop();
@@ -176,7 +124,7 @@ const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frust
 		return true;
 	};
 	for(unsigned nID = 0; nID < _nodes.size(); ) {
-		ContainmentType boxFrustumCont = AAboxInPlanes(_nodes[nID].bounds, frustumPlanes);
+		ContainmentType boxFrustumCont = aabbTester.boxInPlanes(_nodes[nID].bounds);
 		if(boxFrustumCont == ContainmentType::Inside) {
 			nodesInFrustum.push_back(nID);
 			if(!goForward(nID))

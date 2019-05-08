@@ -37,6 +37,37 @@ struct AABB {
 	glm::vec3 centroid() const {
 		return (min+max)/2.f;
 	}
+
+	// lower case = min, upper case = max
+	enum VertexIndex {
+		xyz,
+		xyZ,
+		xYz,
+		xYZ,
+		Xyz,
+		XyZ,
+		XYz,
+		XYZ,
+	};
+
+	glm::vec3 operator[](VertexIndex vi) const {
+		assert(vi >= 0 && vi <= VertexIndex::XYZ);
+		glm::vec3 r = min;
+		if(vi & 1<<2)
+			r.x = max.x;
+		if(vi & 1<<1)
+			r.y = max.y;
+		if(vi & 1<<0)
+			r.z = max.z;
+		return r;
+	}
 };
+
+using Plane = glm::vec4;
+
+inline void normalizePlane(Plane& p) {
+	float l = glm::length(glm::vec3(p));
+	p /= l;
+}
 
 #endif /* TYPES_HPP_18_12_30_14_55_14 */

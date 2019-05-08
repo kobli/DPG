@@ -73,6 +73,7 @@ Camera& Scene::getCamera() {
 
 // see article from Gribb and Hartmann:
 // Fast Extraction of Viewing Frustum Planes from the WorldView-Projection Matrix
+// the planes normals point inside
 std::vector<Plane> Scene::viewFrustumPlanesFromProjMat(const glm::mat4& mat) {
 	using namespace glm;
 	std::vector<Plane> planes(6);
