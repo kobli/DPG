@@ -1,3 +1,4 @@
+#include <functional>
 #include "containment.hpp"
 
 ContainmentType pointInPlane(const glm::vec3& point, const Plane& plane) {
@@ -39,16 +40,15 @@ ContainmentType AAboxInPlane(const AABB& box, const Plane& plane) {
 		return ContainmentType::Intersecting;
 }
 
-ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes, uint8_t* failPlane, PlaneMask* enabledPlanes) {
+ContainmentType AAboxInPlanes_impl(unsigned planeCount, std::function<ContainmentType(unsigned planeI)> aaboxInPlane, uint8_t* failPlane, PlaneMask* enabledPlanes) {
 	bool intersecting = false;
-	for(unsigned i = 0; i < planes.size(); ++i) {
+	for(unsigned i = 0; i < planeCount; ++i) {
 		unsigned planeI = i;
 		if(enabledPlanes && !((*enabledPlanes) & 1<<planeI))
 			continue;
 		if(failPlane)
-			planeI = (*failPlane+i)%planes.size();
-		const Plane& p = planes[planeI];
-		ContainmentType c = AAboxInPlane(box, p);
+			planeI = (*failPlane+i)%planeCount;
+		ContainmentType c = aaboxInPlane(planeI);
 		if(c == ContainmentType::Outside) {
 			if(failPlane)
 				*failPlane = planeI;
@@ -65,6 +65,14 @@ ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes,
 		return ContainmentType::Intersecting;
 	else
 		return ContainmentType::Inside;
+}
+
+ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes, uint8_t* failPlane, PlaneMask* enabledPlanes) {
+	return AAboxInPlanes_impl(
+			planes.size(),
+			[&](unsigned planeI){ return AAboxInPlane(box, planes[planeI]); },
+			failPlane,
+			enabledPlanes);
 }
 
 
@@ -82,32 +90,12 @@ AAboxInPlanesTester_conservative::AAboxInPlanesTester_conservative(const std::ve
 		_np.push_back(npIndicesForPlane(p));
 }
 
-// TODO refactor - remove copypaste
 ContainmentType AAboxInPlanesTester_conservative::boxInPlanes(const AABB& box, uint8_t* failPlane, PlaneMask* enabledPlanes) {
-	bool intersecting = false;
-	for(unsigned i = 0; i < _np.size(); ++i) {
-		unsigned planeI = i;
-		if(enabledPlanes && !((*enabledPlanes) & 1<<planeI))
-			continue;
-		if(failPlane)
-			planeI = (*failPlane+i)%_planes.size();
-		ContainmentType c = this->AAboxInPlane(box, planeI);
-		if(c == ContainmentType::Outside) {
-			if(failPlane)
-				*failPlane = planeI;
-			return ContainmentType::Outside;
-		}
-		else if(c == ContainmentType::Intersecting)
-			intersecting = true;
-		else {
-			if(enabledPlanes)
-				*enabledPlanes &= ~(1<<planeI);
-		}
-	}
-	if(intersecting)
-		return ContainmentType::Intersecting;
-	else
-		return ContainmentType::Inside;
+	return AAboxInPlanes_impl(
+			_planes.size(),
+			[&](unsigned planeI){ return this->AAboxInPlane(box, planeI); },
+			failPlane,
+			enabledPlanes);
 }
 
 AAboxInPlanesTester_conservative::NP AAboxInPlanesTester_conservative::npIndicesForPlane(const Plane& p) {
