@@ -39,12 +39,19 @@ ContainmentType AAboxInPlane(const AABB& box, const Plane& plane) {
 		return ContainmentType::Intersecting;
 }
 
-ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes) {
+ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes, uint8_t* failPlane) {
 	bool intersecting = false;
-	for(const Plane& p : planes) {
+	for(unsigned i = 0; i < planes.size(); ++i) {
+		unsigned planeI = i;
+		if(failPlane)
+			planeI = (*failPlane+i)%planes.size();
+		const Plane& p = planes[planeI];
 		ContainmentType c = AAboxInPlane(box, p);
-		if(c == ContainmentType::Outside)
+		if(c == ContainmentType::Outside) {
+			if(failPlane)
+				*failPlane = planeI;
 			return ContainmentType::Outside;
+		}
 		else if(c == ContainmentType::Intersecting)
 			intersecting = true;
 	}
@@ -58,8 +65,8 @@ ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes)
 AAboxInPlanesTester::AAboxInPlanesTester(const std::vector<Plane>& planes): _planes{planes} {
 }
 
-ContainmentType AAboxInPlanesTester::boxInPlanes(const AABB& box) {
-	return AAboxInPlanes(box, _planes);
+ContainmentType AAboxInPlanesTester::boxInPlanes(const AABB& box, uint8_t* failPlane) {
+	return AAboxInPlanes(box, _planes, failPlane);
 }
 
 
@@ -69,12 +76,18 @@ AAboxInPlanesTester_conservative::AAboxInPlanesTester_conservative(const std::ve
 		_np.push_back(npIndicesForPlane(p));
 }
 
-ContainmentType AAboxInPlanesTester_conservative::boxInPlanes(const AABB& box) {
+ContainmentType AAboxInPlanesTester_conservative::boxInPlanes(const AABB& box, uint8_t* failPlane) {
 	bool intersecting = false;
 	for(unsigned i = 0; i < _np.size(); ++i) {
-		ContainmentType c = this->AAboxInPlane(box, i);
-		if(c == ContainmentType::Outside)
+		unsigned planeI = i;
+		if(failPlane)
+			planeI = (*failPlane+i)%_planes.size();
+		ContainmentType c = this->AAboxInPlane(box, planeI);
+		if(c == ContainmentType::Outside) {
+			if(failPlane)
+				*failPlane = planeI;
 			return ContainmentType::Outside;
+		}
 		else if(c == ContainmentType::Intersecting)
 			intersecting = true;
 	}

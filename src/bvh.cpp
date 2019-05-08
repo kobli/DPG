@@ -124,7 +124,7 @@ const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frust
 		return true;
 	};
 	for(unsigned nID = 0; nID < _nodes.size(); ) {
-		ContainmentType boxFrustumCont = aabbTester.boxInPlanes(_nodes[nID].bounds);
+		ContainmentType boxFrustumCont = aabbTester.boxInPlanes(_nodes[nID].bounds, &_nodes[nID].firstFrustumTestPlane);
 		if(boxFrustumCont == ContainmentType::Inside) {
 			nodesInFrustum.push_back(nID);
 			if(!goForward(nID))

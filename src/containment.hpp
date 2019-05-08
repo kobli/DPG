@@ -15,13 +15,13 @@ ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes)
 
 class AAboxInPlanesTesterBase {
 	public:
-		virtual ContainmentType boxInPlanes(const AABB& box) = 0;
+		virtual ContainmentType boxInPlanes(const AABB& box, uint8_t* failPlane) = 0;
 };
 
 class AAboxInPlanesTester: public AAboxInPlanesTesterBase {
 	public:
 		AAboxInPlanesTester(const std::vector<Plane>& planes);
-		virtual ContainmentType boxInPlanes(const AABB& box) override;
+		virtual ContainmentType boxInPlanes(const AABB& box, uint8_t* failPlane = nullptr) override;
 
 	private:
 		const std::vector<Plane>& _planes;
@@ -40,7 +40,7 @@ class AAboxInPlanesTester_conservative: public AAboxInPlanesTesterBase
 
 	public:
 		AAboxInPlanesTester_conservative(const std::vector<Plane>& planes);
-		virtual ContainmentType boxInPlanes(const AABB& box) override;
+		virtual ContainmentType boxInPlanes(const AABB& box, uint8_t* failPlane = nullptr) override;
 
 	private:
 		NP npIndicesForPlane(const Plane& p);
