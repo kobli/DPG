@@ -110,35 +110,40 @@ void BVH::primitivesAndCentroidsAABB(
 }
 
 const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frustumPlanes) {
+	struct NodeInfo {
+		unsigned id;
+		PlaneMask testedPlanes;
+	};
 	static std::vector<unsigned> nodesInFrustum;
 	nodesInFrustum.clear();
-	std::stack<unsigned> forward;
+	std::stack<NodeInfo> forward;
 	AAboxInPlanesTester_conservative aabbTester(frustumPlanes);
-	auto goForward = [&](unsigned& nID)->bool {
-		while(!forward.empty() && forward.top() <= nID && forward.top() != unsigned(-1))
+	auto goForward = [&](NodeInfo& n)->bool {
+		while(!forward.empty() && forward.top().id <= n.id && forward.top().id != unsigned(-1))
 			forward.pop();
 		if(forward.empty())
 			return false;
-		nID = forward.top();
+		n = forward.top();
 		forward.pop();
 		return true;
 	};
-	for(unsigned nID = 0; nID < _nodes.size(); ) {
-		ContainmentType boxFrustumCont = aabbTester.boxInPlanes(_nodes[nID].bounds, &_nodes[nID].firstFrustumTestPlane);
+	NodeInfo n = {0, PLANESMASK_ALL};
+	while(n.id < _nodes.size()) {
+		ContainmentType boxFrustumCont = aabbTester.boxInPlanes(_nodes[n.id].bounds, &_nodes[n.id].firstFrustumTestPlane, &n.testedPlanes);
 		if(boxFrustumCont == ContainmentType::Inside) {
-			nodesInFrustum.push_back(nID);
-			if(!goForward(nID))
+			nodesInFrustum.push_back(n.id);
+			if(!goForward(n))
 				break;
 		}
 		else if(boxFrustumCont == ContainmentType::Intersecting) {
-			if(_nodes[nID].rightChild == nID+1 || _nodes[nID].rightChild == unsigned(-1)) // the current node is a leaf
-				nodesInFrustum.push_back(nID);
+			if(_nodes[n.id].rightChild == n.id+1 || _nodes[n.id].rightChild == unsigned(-1)) // the current node is a leaf
+				nodesInFrustum.push_back(n.id);
 			else
-				forward.push(_nodes[nID].rightChild);
-			++nID;
+				forward.push({_nodes[n.id].rightChild, n.testedPlanes});
+			++n.id;
 		}
 		else if(boxFrustumCont == ContainmentType::Outside) {
-			if(!goForward(nID))
+			if(!goForward(n))
 				break;
 		}
 		else {

@@ -3,6 +3,10 @@
 #include <vector>
 #include "types.hpp"
 
+using PlaneMask = uint8_t;
+static PlaneMask PLANESMASK_ALL = PlaneMask(-1);
+
+
 enum ContainmentType {
 	Inside,
 	Intersecting,
@@ -15,13 +19,13 @@ ContainmentType AAboxInPlanes(const AABB& box, const std::vector<Plane>& planes)
 
 class AAboxInPlanesTesterBase {
 	public:
-		virtual ContainmentType boxInPlanes(const AABB& box, uint8_t* failPlane) = 0;
+		virtual ContainmentType boxInPlanes(const AABB& box, uint8_t* failPlane, PlaneMask* enabledPlanes) = 0;
 };
 
 class AAboxInPlanesTester: public AAboxInPlanesTesterBase {
 	public:
 		AAboxInPlanesTester(const std::vector<Plane>& planes);
-		virtual ContainmentType boxInPlanes(const AABB& box, uint8_t* failPlane = nullptr) override;
+		virtual ContainmentType boxInPlanes(const AABB& box, uint8_t* failPlane = nullptr, PlaneMask* enabledPlanes = nullptr) override;
 
 	private:
 		const std::vector<Plane>& _planes;
@@ -40,7 +44,7 @@ class AAboxInPlanesTester_conservative: public AAboxInPlanesTesterBase
 
 	public:
 		AAboxInPlanesTester_conservative(const std::vector<Plane>& planes);
-		virtual ContainmentType boxInPlanes(const AABB& box, uint8_t* failPlane = nullptr) override;
+		virtual ContainmentType boxInPlanes(const AABB& box, uint8_t* failPlane = nullptr, PlaneMask* enabledPlanes = nullptr) override;
 
 	private:
 		NP npIndicesForPlane(const Plane& p);
