@@ -165,10 +165,13 @@ void Object::draw(const std::vector<Plane>& frustumPlanes, const glm::vec3& frus
 }
 
 void Object::doDrawing(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& up, const glm::vec3& lookDir) {
-	std::vector<unsigned> visibleNodes = _bvh.nodesInFrustum(frustumPlanes, frustumCenter, lookDir, up);
+	if(_prevFrustumCenter != frustumCenter) {
+		_visibleNodes = _bvh.nodesInFrustum(frustumPlanes, frustumCenter, lookDir, up);
+		_prevFrustumCenter = frustumCenter;
+	}
 	const std::vector<NodePrimitives>& nodePrimitives = _bvh.getNodePrimitiveRanges();
 	_renderedTriangleCount = 0;
-	for(const unsigned& nID: visibleNodes) {
+	for(const unsigned& nID: _visibleNodes) {
 		glDrawElements(GL_TRIANGLES, nodePrimitives[nID].count*3, GL_UNSIGNED_INT, BUFFER_OFFSET(sizeof(unsigned)*3*nodePrimitives[nID].first));
 		_renderedTriangleCount += nodePrimitives[nID].count;
 	}

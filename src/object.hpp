@@ -40,6 +40,8 @@ class Object {
 		bool _queryActive;
 		AABB _aabb;
 		BVH _bvh;
+		glm::vec3 _prevFrustumCenter;
+		std::vector<unsigned> _visibleNodes;
 
 		// frustum center is in model space
 		virtual void draw(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& lookDir, const glm::vec3& up, bool doTimerQuery = false);
