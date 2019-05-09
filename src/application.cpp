@@ -170,10 +170,17 @@ void Application::displayStats() {
 	ss << "FPS: " << int(1/_frameTime) << endl;
 	ss << "Draw time [ms]: " << _scene->totalObjectGPUDrawTime() << endl;
 	ss << "Triangles rendered / total: " << _scene->totalObjectTrianglesRendered() << " / " << _scene->triangleCount() << endl;
-	_fr->RenderText(ss.str(), 10, 100, 0.4, {1,0,0});
+	ss << "Culling time [ms]: " << FC_TRAVERSE_TIME << endl;
+	ss << "Visited node count / total: " << FC_NODE_VISITED_COUNT << " / " << FC_NODE_COUNT << endl;
+	ss << "Tree depth: " << FC_TREE_DEPTH << endl;
+	ss << "Max tris per leaf: " << MAX_PRIMITIVES_IN_LEAF << endl;
+	ss << "VFC optimizations (octant t., plane masking, plane coh., cam. coh.): " << OCTANT_TEST_ENABLED << " " << PLANE_MASKING_ENABLED << " " << PLANE_COHERENCY_ENABLED << " " << CAMERA_COHERENCY_ENABLED << endl;
+	_fr->RenderText(ss.str(), 10, 150, 0.4, {1,0,0});
 }
 
 void Application::display() {
+	FC_NODE_VISITED_COUNT = 0;
+	FC_TRAVERSE_TIME = 0;
 	glClearColor(0, 0, 0, 1);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -230,16 +237,16 @@ void Application::onKeyPressed(unsigned char key) {
 			_cameraSpeed /= 2;
 			break;
 		case 'o':
-			OCTANT_TEST_ENABLED = false;
+			OCTANT_TEST_ENABLED = !OCTANT_TEST_ENABLED;
 			break;
 		case 'm':
-			PLANE_MASKING_ENABLED = false;
+			PLANE_MASKING_ENABLED = !PLANE_MASKING_ENABLED;
 			break;
 		case 'l':
-			PLANE_COHERENCY_ENABLED = false;
+			PLANE_COHERENCY_ENABLED = !PLANE_COHERENCY_ENABLED;
 			break;
 		case 'c':
-			CAMERA_COHERENCY_ENABLED = false;
+			CAMERA_COHERENCY_ENABLED = !CAMERA_COHERENCY_ENABLED;
 			break;
 	}
 }
@@ -248,6 +255,11 @@ void Application::logFrameStats() {
 	if(_statsOutFile) {
 		_statsOutFile << _cameraPlayLineNode.t << " " 
 		 << _frameTime << " "
+		 << _scene->totalObjectTrianglesRendered() << " "
+		 << _scene->triangleCount() << " "
+		 << FC_NODE_VISITED_COUNT << " "
+		 << FC_NODE_COUNT << " "
+		 << FC_TRAVERSE_TIME << " "
 		 << std::endl;
 		if(!_statsOutFile)
 			std::cerr << "Writing frame stats failed\n";

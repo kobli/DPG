@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <glm/glm.hpp>
@@ -165,8 +166,10 @@ void Object::draw(const std::vector<Plane>& frustumPlanes, const glm::vec3& frus
 }
 
 void Object::doDrawing(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& up, const glm::vec3& lookDir) {
-	if(_prevFrustumCenter != frustumCenter && CAMERA_COHERENCY_ENABLED) {
+	if(_prevFrustumCenter != frustumCenter || !CAMERA_COHERENCY_ENABLED) {
+		auto start = std::chrono::steady_clock::now();
 		_visibleNodes = _bvh.nodesInFrustum(frustumPlanes, frustumCenter, lookDir, up);
+		FC_TRAVERSE_TIME += std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-start).count()/1000.f;
 		_prevFrustumCenter = frustumCenter;
 	}
 	const std::vector<NodePrimitives>& nodePrimitives = _bvh.getNodePrimitiveRanges();

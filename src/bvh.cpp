@@ -9,6 +9,7 @@ std::vector<unsigned> BVH::build(const std::vector<Vertex>& vertices, const std:
 	for(unsigned i = 0; i < primitives.size(); ++i)
 		primitives[i] = i;
 	BVHBuildNode root;
+	root.depth = 0;
 	root.firstPrimitive = 0;
 	root.primitiveCount = primitives.size();
 	std::stack<BVHBuildNode*> nodes;
@@ -45,10 +46,13 @@ std::vector<unsigned> BVH::build(const std::vector<Vertex>& vertices, const std:
 			n->children[1].reset(r);
 			l->firstPrimitive = n->firstPrimitive;
 			l->primitiveCount = std::distance(nodePrimsBegin, secondGroupBegin);
+			l->depth = n->depth+1;
 			r->firstPrimitive = l->firstPrimitive + l->primitiveCount;
 			r->primitiveCount = n->primitiveCount - l->primitiveCount;
+			r->depth = n->depth+1;
 			nodes.push(r);
 			nodes.push(l);
+			FC_TREE_DEPTH = std::max(FC_TREE_DEPTH, n->depth+1);
 		}
 	}
 	compress(std::move(root));
@@ -86,6 +90,7 @@ void BVH::compress(BVHBuildNode&& root) {
 			}
 		}
 	}
+	FC_NODE_COUNT = _nodes.size();
 }
 
 void BVH::primitivesAndCentroidsAABB(
@@ -153,6 +158,7 @@ const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frust
 	};
 	NodeInfo n = {0, PLANESMASK_ALL};
 	while(n.id < _nodes.size()) {
+		++FC_NODE_VISITED_COUNT;
 		ContainmentType boxFrustumCont;
 		if(_nodes[n.id].boundingSphereRadius < frustCenterPlaneDistMin && OCTANT_TEST_ENABLED) { // can do octant test
 			const PlaneMask octantPlanesMask = octantToFrustumPlaneMask(_nodes[n.id].centroid, octantPlaneTop, octantPlaneFront, octantPlaneRight);

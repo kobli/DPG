@@ -18,6 +18,7 @@ class BVH {
 	struct BVHBuildNode {
 		AABB bounds;
 		std::unique_ptr<BVHBuildNode> children[2];
+		unsigned depth;
 		unsigned firstPrimitive;
 		unsigned primitiveCount;
 		unsigned compressedNodeI;
