@@ -1,5 +1,6 @@
 #ifndef TYPES_HPP_18_12_30_14_55_14
 #define TYPES_HPP_18_12_30_14_55_14 
+#include <sstream>
 #include <limits>
 #include <GL/gl.h>
 #include <glm/glm.hpp>
@@ -73,6 +74,12 @@ inline void normalizePlane(Plane& p) {
 // normal must already be normalized
 inline Plane planeFromNormalAndPoint(const glm::vec3& normal, const glm::vec3& point) {
 	return glm::vec4(normal, -glm::dot(normal, point));
+}
+
+inline bool sToVec(const std::string& s, glm::vec3& v) {
+	std::stringstream ss(s);
+	ss >> v.x >> v.y >> v.z;
+	return !ss.fail();
 }
 
 enum FrustumPlane {

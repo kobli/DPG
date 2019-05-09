@@ -11,8 +11,6 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-const glm::vec3 UP(0,1,0);
-
 std::ostream& operator<<(std::ostream& s, const glm::vec3& v);
 std::istream& operator>>(std::istream& s, glm::vec3& v);
 

@@ -14,6 +14,8 @@ class Camera {
 		glm::vec3 getLookDir() const;
 		float getNear() const;
 		float getFar() const;
+		void setUpVector(const glm::vec3& up);
+		glm::vec3 getUpVector() const;
 
 	private:
 		void updateView();
@@ -22,5 +24,6 @@ class Camera {
 		glm::vec3 _lookDir;
 		glm::mat4 _view;
 		glm::mat4 _proj;
+		glm::vec3 _up;
 };
 #endif /* CAMERA_HPP_19_04_21_10_18_54 */

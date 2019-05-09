@@ -7,7 +7,8 @@ const float CAM_NEAR = 1.0f;
 const float CAM_FAR = 10000.0f;
 
 Camera::Camera():
-_lookDir{glm::vec3(1,0,0)}
+	_lookDir{glm::vec3(1,0,0)},
+	_up{glm::vec3(0,1,0)}
 {
 	_proj = glm::perspective(glm::radians(60.0f), 1.0f, CAM_NEAR, CAM_FAR);
 	updateView();
@@ -54,5 +55,14 @@ float Camera::getFar() const {
 }
 
 void Camera::updateView() {
-	_view	= glm::lookAt(_position, _position+getLookDir(), UP);
+	_view	= glm::lookAt(_position, _position+getLookDir(), _up);
+}
+
+void Camera::setUpVector(const glm::vec3& up) {
+	_up = up;
+	updateView();
+}
+
+glm::vec3 Camera::getUpVector() const {
+	return _up;
 }

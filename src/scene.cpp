@@ -46,7 +46,7 @@ void Scene::render() {
 				viewFrustumPlanesFromProjMat(mvp),
 				glm::vec3(glm::vec4(frustumCenterWorld, 1)*modelInverse),
 				glm::vec3(glm::vec4(_camera.getLookDir(), 0)*modelInverse),
-				glm::vec3(glm::vec4(UP, 0)*modelInverse),
+				glm::vec3(glm::vec4(_camera.getUpVector(), 0)*modelInverse),
 				true
 				);
 	}

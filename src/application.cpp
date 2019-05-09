@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include <unistd.h>
+#include <map>
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/freeglut.h>
@@ -73,48 +75,63 @@ Application::~Application() {
 
 void Application::processArgs(int argc, char* argv[]) {
 	using namespace std;
-	int opt;
-	std::string cameraRouteIn,
-							cameraRouteOut;
-	float initialT = 0;
-	while((opt = getopt(argc, argv, "s:r:p:qm:u:t:")) != -1) {
-		switch(opt) {
-			case 's':
-				{
-					Object& o = _scene->addObject(optarg);
-					_scene->getCamera().setPosition(
-							glm::vec3(
-								o.getTransform() * glm::vec4(o.getAABB().centroid(), 1.0))
-							);
-					break;
-				}
-			case 'r':
-				cameraRouteOut = optarg;
-				break;
-			case 'p':
-				cameraRouteIn = optarg;
-				break;
-			case 'q':
-				_quitAfterPlayback = true;
-				break;
-			case 'm':
-				_statsOutFile.open(optarg);
-				if(!_statsOutFile)
-					cerr << "Failed to open stats output file " << optarg << endl;
-				break;
-			case 'u':
-				_cameraPlaybackUniformStepSize = std::atof(optarg);
-				break;
-			case 't':
-				initialT = std::atof(optarg);
-				break;
-			default: /* '?' */
-				fprintf(stderr, "Usage: %s -s sceneFile [[-r cameraRouteRecordFile] | [-p cameraRoutePlayFile]] [-q] [-m statisticsOutputFile] [-u playbackUniformStepSize] [-t initialPlaybackT]\n", argv[0]);
-				exit(EXIT_FAILURE);
+	map<string, string> argMap;
+	auto valueIt = argMap.insert({string(),{}}).first;
+	for(int i = 0; i < argc; ++i) {
+		string w(argv[i]+1);
+		if(argv[i][0] == '-' && std::all_of(w.begin(), w.end(), [](unsigned char c){return std::isalpha(c);}))
+			valueIt = argMap.insert({w, {}}).first;
+		else {
+			if(!valueIt->second.empty())
+				valueIt->second += " ";
+			valueIt->second += string(argv[i]);
 		}
 	}
-	if(!cameraRouteIn.empty()) {
-		_cameraRoute.load(cameraRouteIn);
+	// process arguments
+	if(argMap.count("s") != 0) {
+		Object& o = _scene->addObject(argMap["s"]);
+		_scene->getCamera().setPosition(
+				glm::vec3(
+					o.getTransform() * glm::vec4(o.getAABB().centroid(), 1.0))
+				);
+	}
+	else {
+		cerr << "Scene name is a required argument";
+		exit(1);
+	}
+	if(argMap.count("vp")) {
+		glm::vec3 camPos;
+		if(!sToVec(argMap["vp"], camPos)) {
+			cerr << "Could not parse camera position argument.";
+			exit(1);
+		}
+		_scene->getCamera().setPosition(camPos);
+	}
+	if(argMap.count("vd")) {
+		glm::vec3 camDir;
+		if(!sToVec(argMap["vd"], camDir)) {
+			cerr << "Could not parse camera direction argument.";
+			exit(1);
+		}
+		_scene->getCamera().setLookDir(camDir);
+	}
+	if(argMap.count("vu")) {
+		glm::vec3 up;
+		if(!sToVec(argMap["vu"], up)) {
+			cerr << "Could not parse camera UP argument.";
+			exit(1);
+		}
+		_scene->getCamera().setUpVector(up);
+	}
+	if(argMap.count("vf")) {
+		cout << "VF argument (FOV) is not supported.";
+	}
+	float initialT = 0;
+	if(argMap.count("t")) {
+		initialT = stof(argMap["t"]);
+	}
+	if(argMap.count("p")) {
+		_cameraRoute.load(argMap["p"]);
 		_cameraPlayLineNode = _cameraRoute.getNode(initialT);
 		_scene->getCamera().setPosition(_cameraPlayLineNode.position);
 		_scene->getCamera().setLookDir(_cameraPlayLineNode.direction);
@@ -122,8 +139,17 @@ void Application::processArgs(int argc, char* argv[]) {
 		if(initialT)
 			_cameraPlayPaused = true;
 	}
-	else if(!cameraRouteOut.empty())
-		_cameraRouteOutFileName = cameraRouteOut;
+	if(argMap.count("r"))
+		_cameraRouteOutFileName = argMap["r"];
+	if(argMap.count("q"))
+		_quitAfterPlayback = true;
+	if(argMap.count("u"))
+		_cameraPlaybackUniformStepSize = stof(argMap["u"]);
+	if(argMap.count("m")) {
+		_statsOutFile.open(argMap["u"]);
+		if(!_statsOutFile)
+			cerr << "Failed to open stats output file " << argMap["u"] << endl;
+	}
 }
 
 void Application::displayStats() {
@@ -148,22 +174,23 @@ void Application::moveCamera() {
 	const float rotSpeed = 1.0f;
 	Camera& cam = _scene->getCamera();
 	glm::vec3 forward = cam.getLookDir();
+	glm::vec3 up = cam.getUpVector();
 	if(_keyDown[(unsigned char)'q'])
 		cam.rotateHoriz(rotSpeed*_frameTime);
 	if(_keyDown[(unsigned char)'e'])
 		cam.rotateHoriz(-rotSpeed*_frameTime);
 	if(_keyDown[(unsigned char)'a'])
-		cam.move(-glm::normalize(glm::cross(forward,UP))*_frameTime*_cameraSpeed);
+		cam.move(-glm::normalize(glm::cross(forward,up))*_frameTime*_cameraSpeed);
 	if(_keyDown[(unsigned char)'d'])
-		cam.move(glm::normalize(glm::cross(forward,UP))*_frameTime*_cameraSpeed);
+		cam.move(glm::normalize(glm::cross(forward,up))*_frameTime*_cameraSpeed);
 	if(_keyDown[(unsigned char)'w'])
 		cam.move(forward*_frameTime*_cameraSpeed);
 	if(_keyDown[(unsigned char)'s'])
 		cam.move(-forward*_frameTime*_cameraSpeed);
 	if(_keyDown[(unsigned char)'k'])
-		cam.move(UP*_frameTime*_cameraSpeed);
+		cam.move(up*_frameTime*_cameraSpeed);
 	if(_keyDown[(unsigned char)'j'])
-		cam.move(-UP*_frameTime*_cameraSpeed);
+		cam.move(-up*_frameTime*_cameraSpeed);
 
 	if(_cameraPlaySpeed != 0 && !_cameraPlayPaused) {
 		if(_cameraPlaybackUniformStepSize)
