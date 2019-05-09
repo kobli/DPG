@@ -57,18 +57,19 @@ std::vector<unsigned> BVH::build(const std::vector<Vertex>& vertices, const std:
 void BVH::compress(BVHBuildNode&& root) {
 	std::stack<BVHBuildNode*> nodes;
 	nodes.push(&root);
-	_nodes.emplace_back();
-	_nodes.back().bounds = root.bounds;
-	_nodePrimitives.push_back({root.firstPrimitive, root.primitiveCount});
+	auto addNode = [&](const AABB& bounds, unsigned firstPrimitive, unsigned primitiveCount){
+		_nodes.emplace_back();
+		_nodes.back().bounds = bounds;
+		_nodes.back().rightChild = -1;
+		_nodePrimitives.push_back({firstPrimitive, primitiveCount});
+	};
+	addNode(root.bounds, root.firstPrimitive, root.primitiveCount);
 	root.compressedNodeI = 0;
 	while(!nodes.empty()) {
 		BVHBuildNode* n = nodes.top();
 		if(n->children[0]) {
 			n = n->children[0].get();
-			_nodes.emplace_back();
-			_nodes.back().bounds = n->bounds;
-			_nodePrimitives.push_back({n->firstPrimitive, n->primitiveCount});
-			_nodes.back().rightChild = -1;
+			addNode(n->bounds, n->firstPrimitive, n->primitiveCount);
 			n->compressedNodeI = _nodes.size()-1;
 			nodes.push(n);
 		}
@@ -77,12 +78,9 @@ void BVH::compress(BVHBuildNode&& root) {
 			while(!nodes.empty() && !nodes.top()->children[1])
 				nodes.pop();
 			if(!nodes.empty()) {
-				_nodes.emplace_back();
-				_nodes[nodes.top()->compressedNodeI].rightChild = _nodes.size()-1;
+				_nodes[nodes.top()->compressedNodeI].rightChild = _nodes.size();
 				n = nodes.top()->children[1].get();
-				_nodes.back().bounds = n->bounds;
-				_nodes.back().rightChild = -1;
-				_nodePrimitives.push_back({n->firstPrimitive, n->primitiveCount});
+				addNode(n->bounds, n->firstPrimitive, n->primitiveCount);
 				n->compressedNodeI = _nodes.size()-1;
 				nodes.pop();
 				nodes.push(n);
