@@ -6,6 +6,7 @@
 #include "objLoader/objLoader.h"
 #include "utils.hpp"
 #include "object.hpp"
+#include "globals.hpp"
 
 Object::Object(const std::string& fileName): 
 	_queryID{0},
@@ -54,7 +55,6 @@ Object::Object(const std::string& fileName):
 	for(Vertex& v : vertices)
 		v.normal = glm::normalize(v.normal);
 
-	const unsigned MAX_PRIMITIVES_IN_LEAF = 10000;
 	std::vector<unsigned> primitiveOrder = _bvh.build(vertices, primitivesInfo, MAX_PRIMITIVES_IN_LEAF);
 	std::vector<unsigned int> indices(objData.faceCount*3);
 	for(unsigned i = 0; i < primitiveOrder.size(); ++i) {
@@ -165,7 +165,7 @@ void Object::draw(const std::vector<Plane>& frustumPlanes, const glm::vec3& frus
 }
 
 void Object::doDrawing(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& up, const glm::vec3& lookDir) {
-	if(_prevFrustumCenter != frustumCenter) {
+	if(_prevFrustumCenter != frustumCenter && CAMERA_COHERENCY_ENABLED) {
 		_visibleNodes = _bvh.nodesInFrustum(frustumPlanes, frustumCenter, lookDir, up);
 		_prevFrustumCenter = frustumCenter;
 	}

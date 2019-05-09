@@ -1,5 +1,6 @@
 #include <functional>
 #include "containment.hpp"
+#include "globals.hpp"
 
 ContainmentType pointInPlane(const glm::vec3& point, const Plane& plane) {
 	float d = glm::dot(glm::vec4(point, 1), plane);
@@ -44,9 +45,9 @@ ContainmentType AAboxInPlanes_impl(unsigned planeCount, std::function<Containmen
 	bool intersecting = false;
 	for(unsigned i = 0; i < planeCount; ++i) {
 		unsigned planeI = i;
-		if(enabledPlanes && !((*enabledPlanes) & 1<<planeI))
+		if(enabledPlanes && !((*enabledPlanes) & 1<<planeI) && PLANE_MASKING_ENABLED)
 			continue;
-		if(failPlane)
+		if(failPlane && PLANE_COHERENCY_ENABLED)
 			planeI = (*failPlane+i)%planeCount;
 		ContainmentType c = aaboxInPlane(planeI);
 		if(c == ContainmentType::Outside) {

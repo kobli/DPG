@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "bvh.hpp"
 #include "containment.hpp"
+#include "globals.hpp"
 
 std::vector<unsigned> BVH::build(const std::vector<Vertex>& vertices, const std::vector<PrimitiveInfo>& primitivesInfo, unsigned maxPrimitivesInLeaf) {
 	std::vector<unsigned> primitives(primitivesInfo.size());
@@ -153,7 +154,7 @@ const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frust
 	NodeInfo n = {0, PLANESMASK_ALL};
 	while(n.id < _nodes.size()) {
 		ContainmentType boxFrustumCont;
-		if(_nodes[n.id].boundingSphereRadius < frustCenterPlaneDistMin) { // can do octant test
+		if(_nodes[n.id].boundingSphereRadius < frustCenterPlaneDistMin && OCTANT_TEST_ENABLED) { // can do octant test
 			const PlaneMask octantPlanesMask = octantToFrustumPlaneMask(_nodes[n.id].centroid, octantPlaneTop, octantPlaneFront, octantPlaneRight);
 			PlaneMask planeMask = octantPlanesMask & n.testedPlanes; // do not test against planes disabled by plane masking optimization
 			boxFrustumCont = aabbTester.boxInPlanes(_nodes[n.id].bounds, &_nodes[n.id].firstFrustumTestPlane, &planeMask);

@@ -11,6 +11,7 @@
 #include "application.hpp"
 #include "camera.hpp"
 #include "object.hpp"
+#include "globals.hpp"
 
 static const float CAMERA_PLAY_SPEED = 100;
 
@@ -88,6 +89,9 @@ void Application::processArgs(int argc, char* argv[]) {
 		}
 	}
 	// process arguments
+	if(argMap.count("c") != 0) {
+		MAX_PRIMITIVES_IN_LEAF = stof(argMap["c"]);
+	}
 	if(argMap.count("s") != 0) {
 		Object& o = _scene->addObject(argMap["s"]);
 		_scene->getCamera().setPosition(
@@ -150,6 +154,14 @@ void Application::processArgs(int argc, char* argv[]) {
 		if(!_statsOutFile)
 			cerr << "Failed to open stats output file " << argMap["u"] << endl;
 	}
+	if(argMap.count("no-octant-test"))
+		OCTANT_TEST_ENABLED = false;
+	if(argMap.count("no-plane-masking"))
+		PLANE_MASKING_ENABLED = false;
+	if(argMap.count("no-plane-coherency"))
+		PLANE_COHERENCY_ENABLED = false;
+	if(argMap.count("no-camera-coherency"))
+		CAMERA_COHERENCY_ENABLED = false;
 }
 
 void Application::displayStats() {
@@ -216,6 +228,18 @@ void Application::onKeyPressed(unsigned char key) {
 			break;
 		case '-':
 			_cameraSpeed /= 2;
+			break;
+		case 'o':
+			OCTANT_TEST_ENABLED = false;
+			break;
+		case 'm':
+			PLANE_MASKING_ENABLED = false;
+			break;
+		case 'l':
+			PLANE_COHERENCY_ENABLED = false;
+			break;
+		case 'c':
+			CAMERA_COHERENCY_ENABLED = false;
 			break;
 	}
 }
