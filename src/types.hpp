@@ -70,4 +70,17 @@ inline void normalizePlane(Plane& p) {
 	p /= l;
 }
 
+// normal must already be normalized
+inline Plane planeFromNormalAndPoint(const glm::vec3& normal, const glm::vec3& point) {
+	return glm::vec4(normal, -glm::dot(normal, point));
+}
+
+enum FrustumPlane {
+	LEFT,
+	RIGHT,
+	BOT,
+	TOP,
+	NEAR,
+	FAR,
+};
 #endif /* TYPES_HPP_18_12_30_14_55_14 */

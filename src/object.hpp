@@ -41,8 +41,9 @@ class Object {
 		AABB _aabb;
 		BVH _bvh;
 
-		virtual void draw(const std::vector<Plane>& frustumPlanes, bool doTimerQuery = false);
-		void doDrawing(const std::vector<Plane>& frustumPlanes);
+		// frustum center is in model space
+		virtual void draw(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& lookDir, const glm::vec3& up, bool doTimerQuery = false);
+		void doDrawing(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& lookDir, const glm::vec3& up);
 };
 
 #endif /* OBJECT_HPP_19_04_21_09_20_37 */

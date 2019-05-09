@@ -24,10 +24,15 @@ void Scene::render() {
 
 	setUniform(_program, _camera.getViewProjection(), "ViewProject");
 
+	float near = _camera.getNear();
+	float far = _camera.getFar();
+	glm::vec3 frustumCenterWorld = _camera.getPosition() + _camera.getLookDir()*(near + (far-near)/2);
+
 	// draw objects
 	for(Object& o : _objects) {
+		glm::mat4 modelInverse = glm::inverse(o.getTransform());
 		setUniform(_program, o.getTransform(), "Model");
-		setUniform(_program, glm::transpose(glm::inverse(o.getTransform())), "ModelInvT");
+		setUniform(_program, glm::transpose(modelInverse), "ModelInvT");
 
 		const Material& m = o.getMaterial();
 		glUniform4fv(glGetUniformLocation(_program, "Mat.color"), 1, &m.color.r);
@@ -37,7 +42,13 @@ void Scene::render() {
 		glUniform1f(glGetUniformLocation(_program, "Mat.shininess"), m.shininess);
 
 		glm::mat4 mvp = _camera.getViewProjection()*o.getTransform();
-		o.draw(viewFrustumPlanesFromProjMat(mvp), true);
+		o.draw(
+				viewFrustumPlanesFromProjMat(mvp),
+				glm::vec3(glm::vec4(frustumCenterWorld, 1)*modelInverse),
+				glm::vec3(glm::vec4(_camera.getLookDir(), 0)*modelInverse),
+				glm::vec3(glm::vec4(UP, 0)*modelInverse),
+				true
+				);
 	}
 }
 
@@ -77,12 +88,12 @@ Camera& Scene::getCamera() {
 std::vector<Plane> Scene::viewFrustumPlanesFromProjMat(const glm::mat4& mat) {
 	using namespace glm;
 	std::vector<Plane> planes(6);
-	planes[0] = row(mat,3) + row(mat,0); // Left clipping plane
-	planes[1] = row(mat,3) - row(mat,0); // Right clipping plane
-	planes[2] = row(mat,3) + row(mat,1); // Bottom clipping plane
-	planes[3] = row(mat,3) - row(mat,1); // Top clipping plane
-	planes[4] = row(mat,3) + row(mat,2); // Near clipping plane
-	planes[5] = row(mat,3) - row(mat,2); // Far clipping plane
+	planes[LEFT]  = row(mat,3) + row(mat,0);
+	planes[RIGHT] = row(mat,3) - row(mat,0);
+	planes[BOT]   = row(mat,3) + row(mat,1);
+	planes[TOP]   = row(mat,3) - row(mat,1);
+	planes[NEAR]  = row(mat,3) + row(mat,2);
+	planes[FAR]   = row(mat,3) - row(mat,2);
 	// Normalize the plane equations
 	for(Plane& p : planes)
 		normalizePlane(p);

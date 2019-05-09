@@ -12,6 +12,8 @@ class Camera {
 		glm::mat4 getViewProjection() const;
 		glm::vec3 getPosition() const;
 		glm::vec3 getLookDir() const;
+		float getNear() const;
+		float getFar() const;
 
 	private:
 		void updateView();

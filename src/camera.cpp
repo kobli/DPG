@@ -3,10 +3,13 @@
 #include "camera.hpp"
 #include "utils.hpp"
 
+const float CAM_NEAR = 1.0f;
+const float CAM_FAR = 10000.0f;
+
 Camera::Camera():
 _lookDir{glm::vec3(1,0,0)}
 {
-	_proj = glm::perspective(glm::radians(60.0f), 1.0f, 1.f, 10000.0f);
+	_proj = glm::perspective(glm::radians(60.0f), 1.0f, CAM_NEAR, CAM_FAR);
 	updateView();
 }
 
@@ -16,7 +19,7 @@ void Camera::setPosition(const glm::vec3& pos) {
 }
 
 void Camera::setLookDir(const glm::vec3& dir) {
-	_lookDir = dir;
+	_lookDir = glm::normalize(dir);
 	updateView();
 }
 
@@ -26,7 +29,7 @@ void Camera::move(glm::vec3 delta) {
 }
 
 void Camera::rotateHoriz(float delta) {
-	_lookDir = glm::rotateY(_lookDir, delta);
+	_lookDir = glm::normalize(glm::rotateY(_lookDir, delta));
 	updateView();
 }
 
@@ -40,6 +43,14 @@ glm::vec3 Camera::getPosition() const {
 
 glm::vec3 Camera::getLookDir() const {
 	return _lookDir;
+}
+
+float Camera::getNear() const {
+	return CAM_NEAR;
+}
+
+float Camera::getFar() const {
+	return CAM_FAR;
 }
 
 void Camera::updateView() {

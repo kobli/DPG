@@ -58,9 +58,7 @@ void BVH::compress(BVHBuildNode&& root) {
 	std::stack<BVHBuildNode*> nodes;
 	nodes.push(&root);
 	auto addNode = [&](const AABB& bounds, unsigned firstPrimitive, unsigned primitiveCount){
-		_nodes.emplace_back();
-		_nodes.back().bounds = bounds;
-		_nodes.back().rightChild = -1;
+		_nodes.push_back({bounds, unsigned(-1), 0, bounds.centroid(), glm::length(bounds.centroid()-bounds.min)});
 		_nodePrimitives.push_back({firstPrimitive, primitiveCount});
 	};
 	addNode(root.bounds, root.firstPrimitive, root.primitiveCount);
@@ -107,7 +105,34 @@ void BVH::primitivesAndCentroidsAABB(
 	}
 }
 
-const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frustumPlanes) {
+PlaneMask octantToFrustumPlaneMask(const glm::vec3& point, const Plane& octantPlaneTop, const Plane& octantPlaneFront, const Plane& octantPlaneRight) {
+	glm::vec4 p(point, 1);
+	float dTop   = glm::dot(p, octantPlaneTop);
+	float dFront = glm::dot(p, octantPlaneFront);
+	float dRight = glm::dot(p, octantPlaneRight);
+	PlaneMask r = 0;
+	if(dTop > 0)
+		r |= 1<<FrustumPlane::TOP;
+	else
+		r |= 1<<FrustumPlane::BOT;
+	if(dFront > 0)
+		r |= 1<<FrustumPlane::FAR;
+	else
+		r |= 1<<FrustumPlane::NEAR;
+	if(dRight > 0)
+		r |= 1<<FrustumPlane::RIGHT;
+	else
+		r |= 1<<FrustumPlane::LEFT;
+	return r;
+}
+
+const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& lookDir, const glm::vec3& up) {
+	Plane octantPlaneTop = planeFromNormalAndPoint(up, frustumCenter);
+	Plane octantPlaneFront = planeFromNormalAndPoint(lookDir, frustumCenter);
+	Plane octantPlaneRight = planeFromNormalAndPoint(glm::cross(lookDir, up), frustumCenter);
+	float frustCenterPlaneDistMin = std::numeric_limits<float>::max();
+	for(const Plane& p : frustumPlanes)
+		frustCenterPlaneDistMin = fmin(frustCenterPlaneDistMin, abs(glm::dot(p, glm::vec4(frustumCenter, 1))));
 	struct NodeInfo {
 		unsigned id;
 		PlaneMask testedPlanes;
@@ -127,7 +152,17 @@ const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frust
 	};
 	NodeInfo n = {0, PLANESMASK_ALL};
 	while(n.id < _nodes.size()) {
-		ContainmentType boxFrustumCont = aabbTester.boxInPlanes(_nodes[n.id].bounds, &_nodes[n.id].firstFrustumTestPlane, &n.testedPlanes);
+		ContainmentType boxFrustumCont;
+		if(_nodes[n.id].boundingSphereRadius < frustCenterPlaneDistMin) { // can do octant test
+			const PlaneMask octantPlanesMask = octantToFrustumPlaneMask(_nodes[n.id].centroid, octantPlaneTop, octantPlaneFront, octantPlaneRight);
+			PlaneMask planeMask = octantPlanesMask & n.testedPlanes; // do not test against planes disabled by plane masking optimization
+			boxFrustumCont = aabbTester.boxInPlanes(_nodes[n.id].bounds, &_nodes[n.id].firstFrustumTestPlane, &planeMask);
+			// plane masking might have disabled some additional planes - update the mask stored inside the node
+			PlaneMask newlyDisabledPlanes = octantPlanesMask^planeMask;
+			n.testedPlanes &= ~newlyDisabledPlanes;
+		}
+		else
+			boxFrustumCont = aabbTester.boxInPlanes(_nodes[n.id].bounds, &_nodes[n.id].firstFrustumTestPlane, &n.testedPlanes);
 		if(boxFrustumCont == ContainmentType::Inside) {
 			nodesInFrustum.push_back(n.id);
 			if(!goForward(n))

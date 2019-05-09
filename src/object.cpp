@@ -143,7 +143,7 @@ const AABB& Object::getAABB() const {
 	return _aabb;
 }
 
-void Object::draw(const std::vector<Plane>& frustumPlanes, bool doTimerQuery) {
+void Object::draw(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& lookDir, const glm::vec3& up, bool doTimerQuery) {
 	glBindVertexArray(_vao);
 	GLuint64 qr = GL_FALSE;
 	if(_queryActive && doTimerQuery)
@@ -156,16 +156,16 @@ void Object::draw(const std::vector<Plane>& frustumPlanes, bool doTimerQuery) {
 	}
 	if(!_queryActive && doTimerQuery) {
 		glBeginQuery(GL_TIME_ELAPSED, _queryID);
-		doDrawing(frustumPlanes);
+		doDrawing(frustumPlanes, frustumCenter, lookDir, up);
 		glEndQuery(GL_TIME_ELAPSED);
 		_queryActive = true;
 	}
 	else
-		doDrawing(frustumPlanes);
+		doDrawing(frustumPlanes, frustumCenter, lookDir, up);
 }
 
-void Object::doDrawing(const std::vector<Plane>& frustumPlanes) {
-	std::vector<unsigned> visibleNodes = _bvh.nodesInFrustum(frustumPlanes);
+void Object::doDrawing(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& up, const glm::vec3& lookDir) {
+	std::vector<unsigned> visibleNodes = _bvh.nodesInFrustum(frustumPlanes, frustumCenter, lookDir, up);
 	const std::vector<NodePrimitives>& nodePrimitives = _bvh.getNodePrimitiveRanges();
 	_renderedTriangleCount = 0;
 	for(const unsigned& nID: visibleNodes) {
