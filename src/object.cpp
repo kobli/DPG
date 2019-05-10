@@ -45,16 +45,21 @@ Object::Object(const std::string& fileName):
 				vertices[face.vertex_index[1]].position +
 				vertices[face.vertex_index[2]].position
 				)/3.f;
-		const obj_vector& n0 = *objData.normalList[face.normal_index[0]];
-		const obj_vector& n1 = *objData.normalList[face.normal_index[1]];
-		const obj_vector& n2 = *objData.normalList[face.normal_index[2]];
-		vertices[face.vertex_index[0]].normal += glm::vec3(n0.e[0], n0.e[1], n0.e[2]);
-		vertices[face.vertex_index[1]].normal += glm::vec3(n1.e[0], n1.e[1], n1.e[2]);
-		vertices[face.vertex_index[2]].normal += glm::vec3(n2.e[0], n2.e[1], n2.e[2]);
+		if(objData.normalCount > 0) {
+			const obj_vector& n0 = *objData.normalList[face.normal_index[0]];
+			const obj_vector& n1 = *objData.normalList[face.normal_index[1]];
+			const obj_vector& n2 = *objData.normalList[face.normal_index[2]];
+			vertices[face.vertex_index[0]].normal += glm::vec3(n0.e[0], n0.e[1], n0.e[2]);
+			vertices[face.vertex_index[1]].normal += glm::vec3(n1.e[0], n1.e[1], n1.e[2]);
+			vertices[face.vertex_index[2]].normal += glm::vec3(n2.e[0], n2.e[1], n2.e[2]);
+		}
 	}
 	_triangleCount = objData.faceCount;
-	for(Vertex& v : vertices)
-		v.normal = glm::normalize(v.normal);
+	if(objData.normalCount > 0) {
+		for(Vertex& v : vertices) {
+			v.normal = glm::normalize(v.normal);
+		}
+	}
 
 	std::vector<unsigned> primitiveOrder = _bvh.build(vertices, primitivesInfo, MAX_PRIMITIVES_IN_LEAF);
 	std::vector<unsigned int> indices(objData.faceCount*3);
