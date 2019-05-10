@@ -165,7 +165,7 @@ void Object::draw(const std::vector<Plane>& frustumPlanes, const glm::vec3& frus
 		doDrawing(frustumPlanes, frustumCenter, lookDir, up);
 }
 
-void Object::doDrawing(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& up, const glm::vec3& lookDir) {
+void Object::doDrawing(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& lookDir, const glm::vec3& up) {
 	if(_prevFrustumCenter != frustumCenter || !CAMERA_COHERENCY_ENABLED) {
 		auto start = std::chrono::steady_clock::now();
 		_visibleNodes = _bvh.nodesInFrustum(frustumPlanes, frustumCenter, lookDir, up);

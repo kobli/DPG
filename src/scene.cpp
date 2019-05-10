@@ -31,8 +31,9 @@ void Scene::render() {
 	// draw objects
 	for(Object& o : _objects) {
 		glm::mat4 modelInverse = glm::inverse(o.getTransform());
+		glm::mat4 modelInverseT = glm::transpose(modelInverse);
 		setUniform(_program, o.getTransform(), "Model");
-		setUniform(_program, glm::transpose(modelInverse), "ModelInvT");
+		setUniform(_program, modelInverseT, "ModelInvT");
 
 		const Material& m = o.getMaterial();
 		glUniform4fv(glGetUniformLocation(_program, "Mat.color"), 1, &m.color.r);
@@ -45,8 +46,8 @@ void Scene::render() {
 		o.draw(
 				viewFrustumPlanesFromProjMat(mvp),
 				glm::vec3(glm::vec4(frustumCenterWorld, 1)*modelInverse),
-				glm::vec3(glm::vec4(_camera.getLookDir(), 0)*modelInverse),
-				glm::vec3(glm::vec4(_camera.getUpVector(), 0)*modelInverse),
+				glm::vec3(glm::vec4(_camera.getLookDir(), 0)*modelInverseT),
+				glm::vec3(glm::vec4(_camera.getUpVector(), 0)*modelInverseT),
 				true
 				);
 	}

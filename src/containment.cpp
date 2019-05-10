@@ -18,10 +18,10 @@ ContainmentType AAboxInPlane(const AABB& box, const Plane& plane) {
 		{box.max.x, box.min.y, box.min.z},
 		{box.min.x, box.max.y, box.min.z},
 		{box.max.x, box.max.y, box.min.z},
-		box.max,
+		{box.min.x, box.min.y, box.max.z},
 		{box.max.x, box.min.y, box.max.z},
 		{box.min.x, box.max.y, box.max.z},
-		{box.max.x, box.max.y, box.max.z},
+		box.max,
 	};
 
 	bool someInside = false;
@@ -45,10 +45,12 @@ ContainmentType AAboxInPlanes_impl(unsigned planeCount, std::function<Containmen
 	bool intersecting = false;
 	for(unsigned i = 0; i < planeCount; ++i) {
 		unsigned planeI = i;
-		if(enabledPlanes && !((*enabledPlanes) & 1<<planeI) && PLANE_MASKING_ENABLED)
-			continue;
 		if(failPlane && PLANE_COHERENCY_ENABLED)
 			planeI = (*failPlane+i)%planeCount;
+		if(enabledPlanes && !((*enabledPlanes) & 1<<planeI)){
+			//assert(aaboxInPlane(planeI) == ContainmentType::Inside); // does not hold for octant test
+			continue;
+		}
 		ContainmentType c = aaboxInPlane(planeI);
 		if(c == ContainmentType::Outside) {
 			if(failPlane)
@@ -58,7 +60,7 @@ ContainmentType AAboxInPlanes_impl(unsigned planeCount, std::function<Containmen
 		else if(c == ContainmentType::Intersecting)
 			intersecting = true;
 		else {
-			if(enabledPlanes)
+			if(enabledPlanes && PLANE_MASKING_ENABLED)
 				*enabledPlanes &= ~(1<<planeI);
 		}
 	}

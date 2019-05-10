@@ -1,5 +1,6 @@
 #include <stack>
 #include <algorithm>
+#include <iostream>
 #include "bvh.hpp"
 #include "containment.hpp"
 #include "globals.hpp"
@@ -133,12 +134,12 @@ PlaneMask octantToFrustumPlaneMask(const glm::vec3& point, const Plane& octantPl
 }
 
 const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& lookDir, const glm::vec3& up) {
-	Plane octantPlaneTop = planeFromNormalAndPoint(up, frustumCenter);
 	Plane octantPlaneFront = planeFromNormalAndPoint(lookDir, frustumCenter);
 	Plane octantPlaneRight = planeFromNormalAndPoint(glm::cross(lookDir, up), frustumCenter);
+	Plane octantPlaneTop = planeFromNormalAndPoint(glm::cross(glm::vec3(octantPlaneRight), lookDir), frustumCenter);
 	float frustCenterPlaneDistMin = std::numeric_limits<float>::max();
 	for(const Plane& p : frustumPlanes)
-		frustCenterPlaneDistMin = fmin(frustCenterPlaneDistMin, abs(glm::dot(p, glm::vec4(frustumCenter, 1))));
+		frustCenterPlaneDistMin = fmin(frustCenterPlaneDistMin, glm::dot(p, glm::vec4(frustumCenter, 1)));
 	struct NodeInfo {
 		unsigned id;
 		PlaneMask testedPlanes;
@@ -176,11 +177,15 @@ const std::vector<unsigned>& BVH::nodesInFrustum(const std::vector<Plane>& frust
 				break;
 		}
 		else if(boxFrustumCont == ContainmentType::Intersecting) {
-			if(_nodes[n.id].rightChild == n.id+1 || _nodes[n.id].rightChild == unsigned(-1)) // the current node is a leaf
+			if(_nodes[n.id].rightChild == n.id+1 || _nodes[n.id].rightChild == unsigned(-1)) { // the current node is a leaf
 				nodesInFrustum.push_back(n.id);
-			else
+				if(!goForward(n))
+					break;
+			}
+			else {
 				forward.push({_nodes[n.id].rightChild, n.testedPlanes});
-			++n.id;
+				++n.id;
+			}
 		}
 		else if(boxFrustumCont == ContainmentType::Outside) {
 			if(!goForward(n))
