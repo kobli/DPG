@@ -1,9 +1,9 @@
 #ifndef TYPES_HPP_18_12_30_14_55_14
 #define TYPES_HPP_18_12_30_14_55_14 
+
 #include <sstream>
 #include <limits>
-#include <GL/gl.h>
-#include <glm/glm.hpp>
+#include "main.hpp"
 
 struct Color {
 	float r;
@@ -83,11 +83,11 @@ inline bool sToVec(const std::string& s, glm::vec3& v) {
 }
 
 enum FrustumPlane {
-	LEFT,
-	RIGHT,
-	BOT,
-	TOP,
-	NEAR,
-	FAR,
+	Left,
+	Right,
+	Bot,
+	Top,
+	Near,
+	Far,
 };
 #endif /* TYPES_HPP_18_12_30_14_55_14 */

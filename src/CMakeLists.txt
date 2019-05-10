@@ -1,14 +1,25 @@
 cmake_minimum_required(VERSION 3.2)
 project(FrustumCulling)
 
+
+find_library(FREETYPE_LIB freetype HINTS ${PROJECT_BINARY_DIR})
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(GLM REQUIRED)
+
+add_definitions(${GLM_DEFINITIONS})
+
 include_directories(
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_SOURCE_DIR}/freetype
 	${PROJECT_SOURCE_DIR}/freetype/config
+    ${OPENGL_INCLUDE_DIRS} 
+    ${GLUT_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
+    ${GLM_INCLUDE_DIRS}
 	)
-
-find_library(FREETYPE_LIB freetype HINTS ${PROJECT_BINARY_DIR})
-
+    
 file(GLOB_RECURSE ${CMAKE_PROJECT_NAME}_src
 	"*.h"
 	"*.hpp"
@@ -19,9 +30,9 @@ add_executable(${CMAKE_PROJECT_NAME} ${${CMAKE_PROJECT_NAME}_src})
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
 	${FREETYPE_LIB}
-	GL
-	glut
-	GLEW
+    ${OPENGL_LIBRARIES}
+    ${GLUT_LIBRARY}
+    ${GLEW_LIBRARIES}
 	)
 
 ################## DOXYGEN ################## 

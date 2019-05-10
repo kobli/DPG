@@ -119,17 +119,17 @@ PlaneMask octantToFrustumPlaneMask(const glm::vec3& point, const Plane& octantPl
 	float dRight = glm::dot(p, octantPlaneRight);
 	PlaneMask r = 0;
 	if(dTop > 0)
-		r |= 1<<FrustumPlane::TOP;
+		r |= 1<<FrustumPlane::Top;
 	else
-		r |= 1<<FrustumPlane::BOT;
+		r |= 1<<FrustumPlane::Bot;
 	if(dFront > 0)
-		r |= 1<<FrustumPlane::FAR;
+		r |= 1<<FrustumPlane::Far;
 	else
-		r |= 1<<FrustumPlane::NEAR;
+		r |= 1<<FrustumPlane::Near;
 	if(dRight > 0)
-		r |= 1<<FrustumPlane::RIGHT;
+		r |= 1<<FrustumPlane::Right;
 	else
-		r |= 1<<FrustumPlane::LEFT;
+		r |= 1<<FrustumPlane::Left;
 	return r;
 }
 

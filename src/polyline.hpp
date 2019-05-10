@@ -7,16 +7,16 @@
 #include <glm/gtx/quaternion.hpp>
 #include "utils.hpp"
 
-struct PolylineNode {
-	PolylineNode(const glm::vec3& pos = {}, const glm::vec3& dir = {}): position{pos}, direction{dir}
+struct PolyLineNode {
+	PolyLineNode(const glm::vec3& pos = {}, const glm::vec3& dir = {}): position{pos}, direction{dir}
 	{}
 
 	// /t/ is a global interpolation parameter <0;1> (with respect to the entire line)
 	// this node is the first along the line (the one with lower t value)
-	PolylineNode interpolate(const PolylineNode& n2, float tg);
+	PolyLineNode interpolate(const PolyLineNode& n2, float tg);
 
 	// returns direct distance from a node (not along the line)
-	float distanceFrom(const PolylineNode& n);
+	float distanceFrom(const PolyLineNode& n);
 
 	float t; // normalized distance from the beginning of the line (in range <0;1>)
 	float distance;
@@ -25,15 +25,15 @@ struct PolylineNode {
 	glm::vec3 direction;
 };
 
-std::ostream& operator<<(std::ostream& os, const PolylineNode& n);
-std::istream& operator>>(std::istream& is, PolylineNode& n);
+std::ostream& operator<<(std::ostream& os, const PolyLineNode& n);
+std::istream& operator>>(std::istream& is, PolyLineNode& n);
 
 template <typename NodeT>
-class Polyline {
+class PolyLine {
 	template <typename T>
-	friend std::ostream& operator<<(std::ostream& os, const Polyline<T>& l);
+	friend std::ostream& operator<<(std::ostream& os, const PolyLine<T>& l);
 	template <typename T>
-	friend std::istream& operator>>(std::istream& os, Polyline<T>& l);
+	friend std::istream& operator>>(std::istream& os, PolyLine<T>& l);
 
 	public:
 		void appendNode(const NodeT& node) {
@@ -100,14 +100,14 @@ class Polyline {
 };
 
 template <typename NodeT>
-std::ostream& operator<<(std::ostream& os, const Polyline<NodeT>& l) {
+std::ostream& operator<<(std::ostream& os, const PolyLine<NodeT>& l) {
 	for(const NodeT& n : l._nodes)
 		os << n << std::endl;
 	return os;
 }
 
 template <typename NodeT>
-std::istream& operator>>(std::istream& is, Polyline<NodeT>& l) {
+std::istream& operator>>(std::istream& is, PolyLine<NodeT>& l) {
 	NodeT n;
 	while(is.good()) {
 		is >> n;

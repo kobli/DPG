@@ -24,9 +24,9 @@ void Scene::render() {
 
 	setUniform(_program, _camera.getViewProjection(), "ViewProject");
 
-	float near = _camera.getNear();
-	float far = _camera.getFar();
-	glm::vec3 frustumCenterWorld = _camera.getPosition() + _camera.getLookDir()*(near + (far-near)/2);
+	float n = _camera.getNear();
+	float f = _camera.getFar();
+	glm::vec3 frustumCenterWorld = _camera.getPosition() + _camera.getLookDir()*(n + (f-n)/2);
 
 	// draw objects
 	for(Object& o : _objects) {
@@ -89,12 +89,12 @@ Camera& Scene::getCamera() {
 std::vector<Plane> Scene::viewFrustumPlanesFromProjMat(const glm::mat4& mat) {
 	using namespace glm;
 	std::vector<Plane> planes(6);
-	planes[LEFT]  = row(mat,3) + row(mat,0);
-	planes[RIGHT] = row(mat,3) - row(mat,0);
-	planes[BOT]   = row(mat,3) + row(mat,1);
-	planes[TOP]   = row(mat,3) - row(mat,1);
-	planes[NEAR]  = row(mat,3) + row(mat,2);
-	planes[FAR]   = row(mat,3) - row(mat,2);
+	planes[Left]  = row(mat,3) + row(mat,0);
+	planes[Right] = row(mat,3) - row(mat,0);
+	planes[Bot]   = row(mat,3) + row(mat,1);
+	planes[Top]   = row(mat,3) - row(mat,1);
+	planes[Near]  = row(mat,3) + row(mat,2);
+	planes[Far]   = row(mat,3) - row(mat,2);
 	// Normalize the plane equations
 	for(Plane& p : planes)
 		normalizePlane(p);

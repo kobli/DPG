@@ -1,12 +1,9 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
-#include <unistd.h>
+#include <cctype>
 #include <map>
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/freeglut.h>
-#include <glm/glm.hpp>
+#include "main.hpp"
 #include "utils.hpp"
 #include "application.hpp"
 #include "camera.hpp"
@@ -48,7 +45,7 @@ Application::Application(int argc, char* argv[]):
 	if(glDebugMessageCallback){
 		cout << "Register OpenGL debug callback " << endl;
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(openglCallbackFunction, nullptr);
+		glDebugMessageCallback(GLDEBUGPROC(openglCallbackFunction), nullptr);
 		GLuint unusedIds = 0;
 		glDebugMessageControl(GL_DONT_CARE,
 				GL_DONT_CARE,
@@ -226,7 +223,7 @@ void Application::onKeyPressed(unsigned char key) {
 	const Camera& cam = _scene->getCamera();
 	switch(key) {
 		case 'r':
-			_cameraRoute.appendNode(PolylineNode(cam.getPosition(), cam.getLookDir()));
+			_cameraRoute.appendNode(PolyLineNode(cam.getPosition(), cam.getLookDir()));
 			break;
 		case 'p':
 			_cameraPlayPaused = !_cameraPlayPaused;

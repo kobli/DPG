@@ -14,6 +14,7 @@ Object::Object(const std::string& fileName):
 	_vao{0},
 	_indexBuffer{0},
 	_vertexBuffer{0},
+	_transform{1},
 	_queryActive{false}
 {
 	objLoader objData;
@@ -122,7 +123,7 @@ void Object::setPosition(glm::vec3 pos) {
 }
 
 glm::vec3 Object::getPosition() const {
-	return _transform[3];
+	return glm::vec3( _transform[3]);
 }
 
 double Object::getDrawTime() const {

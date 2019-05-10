@@ -34,10 +34,10 @@ class Application {
 		float _cameraSpeed;
 		std::ofstream _statsOutFile;
 
-		Polyline<PolylineNode> _cameraRoute;
+		PolyLine<PolyLineNode> _cameraRoute;
 		std::string _cameraRouteOutFileName;
 		float _cameraPlaySpeed;
-		PolylineNode _cameraPlayLineNode;
+		PolyLineNode _cameraPlayLineNode;
 		bool _quitAfterPlayback;
 		bool _cameraPlayPaused;
 		float _cameraPlaybackUniformStepSize;
