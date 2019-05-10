@@ -37,6 +37,7 @@ Application::Application(int argc, char* argv[]):
 	glutInitContextFlags (GLUT_CORE_PROFILE | GLUT_DEBUG);
 	glutInitWindowSize(1024,1024);
 	glutCreateWindow(argv[0]);
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 
 	if(glewInit()) {
 		cerr << "Cannot initialize GLEW\n";
@@ -69,7 +70,10 @@ Application::Application(int argc, char* argv[]):
 }
 
 Application::~Application() {
-	_cameraRoute.save(_cameraRouteOutFileName);
+	if (_cameraRoute.save(_cameraRouteOutFileName))
+		std::cout << "Camera route saved.\n";
+	else
+		std::cerr << "Failed to save camera route.\n";
 }
 
 void Application::processArgs(int argc, char* argv[]) {

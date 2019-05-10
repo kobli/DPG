@@ -4,7 +4,7 @@
 #include "utils.hpp"
 
 const float CAM_NEAR = 1.0f;
-const float CAM_FAR = 10000.0f;
+const float CAM_FAR = 100000.0f;
 
 Camera::Camera():
 	_lookDir{glm::vec3(1,0,0)},
