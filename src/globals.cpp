@@ -1,8 +1,8 @@
 unsigned MAX_PRIMITIVES_IN_LEAF = 10000;
 
-bool OCTANT_TEST_ENABLED = false;
-bool PLANE_MASKING_ENABLED = false;
-bool PLANE_COHERENCY_ENABLED = false;
+bool OCTANT_TEST_ENABLED      = true;
+bool PLANE_MASKING_ENABLED    = true;
+bool PLANE_COHERENCY_ENABLED  = true;
 bool CAMERA_COHERENCY_ENABLED = false;
 
 unsigned FC_TREE_DEPTH = 0;
