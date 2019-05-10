@@ -94,20 +94,20 @@ void Application::processArgs(int argc, char* argv[]) {
 		MAX_PRIMITIVES_IN_LEAF = stof(argMap["c"]);
 	}
 	if(argMap.count("s") != 0) {
-		Object& o = _scene->addObject(argMap["s"]);
+		Object& o = _scene->addObject("../data/"+argMap["s"]);
 		_scene->getCamera().setPosition(
 				glm::vec3(
 					o.getTransform() * glm::vec4(o.getAABB().centroid(), 1.0))
 				);
 	}
 	else {
-		cerr << "Scene name is a required argument";
+		cerr << "Scene name is a required argument.\n";
 		exit(1);
 	}
 	if(argMap.count("vp")) {
 		glm::vec3 camPos;
 		if(!sToVec(argMap["vp"], camPos)) {
-			cerr << "Could not parse camera position argument.";
+			cerr << "Could not parse camera position argument.\n";
 			exit(1);
 		}
 		_scene->getCamera().setPosition(camPos);
@@ -115,7 +115,7 @@ void Application::processArgs(int argc, char* argv[]) {
 	if(argMap.count("vd")) {
 		glm::vec3 camDir;
 		if(!sToVec(argMap["vd"], camDir)) {
-			cerr << "Could not parse camera direction argument.";
+			cerr << "Could not parse camera direction argument.\n";
 			exit(1);
 		}
 		_scene->getCamera().setLookDir(camDir);
@@ -123,13 +123,13 @@ void Application::processArgs(int argc, char* argv[]) {
 	if(argMap.count("vu")) {
 		glm::vec3 up;
 		if(!sToVec(argMap["vu"], up)) {
-			cerr << "Could not parse camera UP argument.";
+			cerr << "Could not parse camera UP argument.\n";
 			exit(1);
 		}
 		_scene->getCamera().setUpVector(up);
 	}
 	if(argMap.count("vf")) {
-		cout << "VF argument (FOV) is not supported.";
+		_scene->getCamera().setFOV(stof(argMap["vf"]));
 	}
 	float initialT = 0;
 	if(argMap.count("t")) {

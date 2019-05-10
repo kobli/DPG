@@ -8,9 +8,10 @@ const float CAM_FAR = 10000.0f;
 
 Camera::Camera():
 	_lookDir{glm::vec3(1,0,0)},
-	_up{glm::vec3(0,1,0)}
+	_up{glm::vec3(0,1,0)}, 
+	_fov{glm::radians(60.0f)}
 {
-	_proj = glm::perspective(glm::radians(60.0f), 1.0f, CAM_NEAR, CAM_FAR);
+	_proj = glm::perspective(_fov, 1.0f, CAM_NEAR, CAM_FAR);
 	updateView();
 }
 
@@ -65,4 +66,10 @@ void Camera::setUpVector(const glm::vec3& up) {
 
 glm::vec3 Camera::getUpVector() const {
 	return _up;
+}
+
+void Camera::setFOV(float fov) {
+	_fov = fov;
+	_proj = glm::perspective(_fov, 1.0f, CAM_NEAR, CAM_FAR);
+	updateView();
 }

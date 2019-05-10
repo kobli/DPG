@@ -16,6 +16,7 @@ class Camera {
 		float getFar() const;
 		void setUpVector(const glm::vec3& up);
 		glm::vec3 getUpVector() const;
+		void setFOV(float fov);
 
 	private:
 		void updateView();
@@ -25,5 +26,6 @@ class Camera {
 		glm::mat4 _view;
 		glm::mat4 _proj;
 		glm::vec3 _up;
+		float _fov; // radians
 };
 #endif /* CAMERA_HPP_19_04_21_10_18_54 */
