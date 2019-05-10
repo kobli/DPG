@@ -255,6 +255,7 @@ void Application::logFrameStats() {
 	if(_statsOutFile) {
 		_statsOutFile << _cameraPlayLineNode.t << " " 
 		 << _frameTime << " "
+		 << _scene->totalObjectGPUDrawTime() << " "
 		 << _scene->totalObjectTrianglesRendered() << " "
 		 << _scene->triangleCount() << " "
 		 << FC_NODE_VISITED_COUNT << " "
