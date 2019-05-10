@@ -30,6 +30,7 @@ class Application {
 		std::unique_ptr<Scene> _scene;
 		std::unique_ptr<FontRenderer> _fr;
 		float _frameTime;
+		float _runningTime;
 		float _cameraSpeed;
 		std::ofstream _statsOutFile;
 

@@ -26,6 +26,7 @@ void Application::run() {
 
 Application::Application(int argc, char* argv[]):
 	_frameTime{0}, 
+	_runningTime{0}, 
 	_cameraSpeed{100},
 	_cameraPlaySpeed{0},
 	_quitAfterPlayback{false},
@@ -150,9 +151,9 @@ void Application::processArgs(int argc, char* argv[]) {
 	if(argMap.count("u"))
 		_cameraPlaybackUniformStepSize = stof(argMap["u"]);
 	if(argMap.count("m")) {
-		_statsOutFile.open(argMap["u"]);
+		_statsOutFile.open(argMap["m"]);
 		if(!_statsOutFile)
-			cerr << "Failed to open stats output file " << argMap["u"] << endl;
+			cerr << "Failed to open stats output file " << argMap["m"] << endl;
 	}
 	if(argMap.count("no-octant-test"))
 		OCTANT_TEST_ENABLED = false;
@@ -269,13 +270,15 @@ void Application::logFrameStats() {
 
 void Application::idle() {
 	static float old_t = glutGet(GLUT_ELAPSED_TIME);
-	int t;
-	t = glutGet(GLUT_ELAPSED_TIME);
+	float t = glutGet(GLUT_ELAPSED_TIME);
 	instance()._frameTime = (t - old_t) / 1000.0;
 	old_t = t;
+	instance()._runningTime += instance()._frameTime;
 
 	instance().logFrameStats();
 	if(instance()._quitAfterPlayback && instance()._cameraPlayLineNode.t == 1)
+		exit(0);
+	if(instance()._quitAfterPlayback && instance()._runningTime >= 1)
 		exit(0);
 	instance().moveCamera();
 	glutPostRedisplay();
