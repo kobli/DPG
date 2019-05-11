@@ -6,7 +6,7 @@ find_library(FREETYPE_LIB freetype HINTS ${PROJECT_BINARY_DIR})
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(GLM REQUIRED)
+find_package(glm REQUIRED)
 
 add_definitions(${GLM_DEFINITIONS})
 
