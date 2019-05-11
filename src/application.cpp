@@ -82,7 +82,7 @@ void Application::processArgs(int argc, char* argv[]) {
 	auto valueIt = argMap.insert({string(),{}}).first;
 	for(int i = 0; i < argc; ++i) {
 		string w(argv[i]+1);
-		if(argv[i][0] == '-' && std::all_of(w.begin(), w.end(), [](unsigned char c){return std::isalpha(c);}))
+		if(argv[i][0] == '-' && std::all_of(w.begin(), w.end(), [](unsigned char c){return !(std::isdigit(c) || std::isblank(c));}))
 			valueIt = argMap.insert({w, {}}).first;
 		else {
 			if(!valueIt->second.empty())
