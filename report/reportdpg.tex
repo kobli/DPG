@@ -87,28 +87,32 @@ view frustum culling, bounding volume hierarchy, middle point subdivision
 %%%% -------------------------------------------------------- 
 %\section{\label{SEC:Intro}Úvod}
 \section{\label{SEC:Intro}Introduction}
-
-Tady bude krátký úvod do semestrální práce, motivace a cíle.
+View frustum culling is the process of identifying objects (or triangles) that lie outside the view frustum so they can be removed from the rendering pipeline. This reduces the load of the pipeline stages up to and including clipping. 
+The goal of this project is to create an efficient implementation of a frustum culling algorithm for large static scenes, utilizing a bounding volume hierarchy, where the bounding volumes are axis-aligned bounding boxes.
 
 %%%% -------------------------------------------------------- 
 %\section{\label{SEC:Description}Popis algoritmu}
 \section{\label{SEC:Description}Algorithm Description}
+\subsection{Building the BVH}
+First, the BVH must be built. The top-down method is used, which means that all triangles are put into a single node, the root, and the nodes are recursively split in two by dividing the triangles inside the node into two groups, according to chosen scheme. Each group is then passed to the newly created child node. This process is repeated until each node contains fewer triangles than specified threshold.
 
-Zkrácený slovní popis algoritmu, je možné použít i pseudokódy,
-například balík {\textsc algorithm2e.sty}, pak je nutné odkomentovat
-v~tomto souboru řádek:\\
+The chosen subdivision scheme is midpoint subdivision, which first calculates a midpoint and extents from triangle centroids along each axis and chooses the splitting axis as the one with largest extent, thus forming a splitting plane, which is perpendicular to this axis and contains the midpoint. Then it divides the primitives into two groups based on the position of their centroids relative to the splitting plane.
 
-{\textsc \textbackslash usepackage\{algorithm2e\}}.\\
+The shape of the tree is not known in advance, so it is easier to use the dynamic representation where each node is allocated separately and the children are linked by pointers. This is however not suitable for traversal because the nodes are not stored on subsequent memory locations, so the they can not be loaded into cache in advance. Also the pointers waste space in cache. To avoid this, the tree is transformed into an array representation, where left child is always the following node in the array and the index of the right child is stored inside the node. Therefore the order of nodes in the array corresponds to the DFS pre-order traversal.
 
-Dokumentace k psaní pseudokódů na adrese:\\
+\subsection{Hierarchy traversal}
+By using a hierarchical data structure it is possible to lower the computational cost of culling when high accuracy is not needed or when the objects (meaning their bounding volume) are well aligned with the frustum. The hierarchy is traversed using DFS pre-order. Whenever a node is fully inside the frustum, there is no need to test its children and triangles of all leaves in this subtree can be sent for rendering.\footnote{Therefore it is beneficial to sort the triangles in order corresponding to the order of leaves in DFS traversal -- triangle ranges of siblings will be adjacent and their union will form a continuous range.} When a node is fully outside the frustum, all of its children will be outside as well so this subtree can be skipped. If the node intersects the frustum and it is not a leaf, it might still be possible to eliminate some triangles by recursing down the tree and doing more tests. In case the intersecting node is a leaf, all its triangles have to be rendered since it does not pay off to test every single triangle. Therefore the number of triangles in leaves should be suitably chosen.
 
-\url{http://www.ctan.org/tex-archive/macros/latex/contrib/algorithm2e/algorithm2e.pdf}
+\subsection{Frustum\,-\,box intersection test}
+One approach to this problem is to transform the frustum into perspective coordinate system, therefore it becomes a box. Each bounding volume also has to be transformed, in case of AABB it means to transform all eight vertices and construct their AABB. Thus the problem becomes an intersection test of two AABBs, which can be solved by six comparisons. This approach pays most of its price on the vertex transformations, leaving no room for optimizations.
 
-Příklad pseudokódu algoritmu je uveden na obrázku~\ref{pseudo-code-rec}:
+Second approach, the one used in this project, is to test the box against each of the frustum planes, either in world space or in model space.\footnote{The tests must be done in model space if the object transformation changes, so the BVH does not have to be rebuilt. Also if there are multiple objects with different transforms, the same BVH can be used for all of them.} It offers more room for optimizations, which will be described in further sections.
 
-\input{rec.tex}
+\subsection{Efficient plane\,-\,box intersection test}
+Exact test cosists of testing position of eight points against a plane, meaning eight dot products and comparisons. There is a more efficient conservative algorithm, which can be used instead.\footnote{A conservative algorithm can be used, because when the result of the test is \emph{intersecting} instead of \emph{outside}, the only consequence is that the children will be tested as well.} The idea is that it is sufficient to test the two vertices that lie on the diagonal which is best aligned with the normal of the plane. They can be found by using the binary encoded signs of components of the plane normal vector as index into a lookup table. The vertex farther along the normal is called \emph{p-vertex}, the other one \emph{n-vertex}. If the \emph{n-vertex} is inside the plane, then the box is inside. Else if the \emph{p-vertex} is inside the plane, then the box is intersecting the plane. Otherwise it is outside the plane. The indices of the \emph{p-} and \emph{n- vertices} are the same for a given plane and all AABBs.
 
-Minimální délka popisu algoritmu 3/4 stránky.
+\subsection{Culling optimization techniques}
+There are several possible optimizations. \emph{Plane masking} exploits the hierarchical structure -- when a node is inside a plane, all the child nodes must also be inside that plane, therefore the tests against those planes can be skipped. \emph{Plane coherency} tries to end the testing of box against set of plains earlier by starting with the plane the box was outside of last time. \emph{Octant test} is usable only for symetric frustum (meaning horizontal and vertical field of view is the same) and only if the radius of the bounding sphere of a node is not greater than the smallest distance from frustum center to any of its planes. It works by splitting the frustum into eight symetric octants, identifying the octant that contains the centroid of the node bounding sphere (or bounding sphere of the AABB, which may give a worse fit) and testing only against the three outer planes of that octant.
 
 %%%% -------------------------------------------------------- 
 %%\section{\label{SEC:Pitfalls}Potíže při implementaci}
