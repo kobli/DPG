@@ -25,9 +25,9 @@
 \pdfpageheight=297 true mm
 
 % Pro cestinu zakomentuj nasledujici radek
-%\selectlanguage{english}
+\selectlanguage{english}
 % Pro anglictinu zakomentuj nasledujici radek
-\selectlanguage{czech}
+%\selectlanguage{czech}
 
 % Znakem procenta zacina komentovaný řádek
 
@@ -39,14 +39,22 @@
 %\usepackage{ctable}
 %\DeclareGraphicsExtensions{.pdf}
 
+% Remove the footer "Preprint submitted .."
+\makeatletter
+\def\ps@pprintTitle{%
+	\let\@oddhead\@empty
+	\let\@evenhead\@empty
+	\def\@oddfoot{}%
+	\let\@evenfoot\@oddfoot}
+
 \begin{document}
 
 \begin{frontmatter}
 
-\title{Zadání semestrální práce číslo XXXX\\ název semestrální práce}
+\title{Term project number 17\\ Hierarchical View-Frustum Culling for Z-buffer Rendering}
 
-\author{Josef Novák and Lukáš Novotný\footnote{A4M39DPG -- Josef Novák a Lukáš Novotný, letní semestr 2009/10}\\
-Katedra počítačové grafiky a interakce,\\ Fakulta elektrotechnická, ČVUT Praha
+\author{Aleš Koblížek\footnote{B4M39DPG -- Aleš Koblížek, summer 2018/19}\\
+Department of Computer Graphics and Interaction,\\ Faculty of Electrical Engineering, CTU in Prague
 }
 
 \date{}
@@ -58,12 +66,12 @@ Katedra počítačové grafiky a interakce,\\ Fakulta elektrotechnická, ČVUT P
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-  Tady bude zadání úlohy buď v češtině nebo angličtině.
+Implement hierarchical view frustum culling for large scale scenes consisting of triangles. First, construct a bounding volume hierarchy (BVH) using top-down method, middle point subdivision. Avoid rendering such BVH nodes that cannot be visible (out of viewing frustum) usually known as view frustum culling.
 \end{abstract}
 
   % Klicova slova k uloze
 \begin{keyword}
-ray tracing, octrees, ...,
+view frustum culling, bounding volume hierarchy, middle point subdivision
 \end{keyword}
 
 \end{frontmatter}
@@ -77,14 +85,14 @@ ray tracing, octrees, ...,
 %% \input{./section5.tex}
 
 %%%% -------------------------------------------------------- 
-\section{\label{SEC:Intro}Úvod}
-%\section{\label{SEC:Intro}Introduction}
+%\section{\label{SEC:Intro}Úvod}
+\section{\label{SEC:Intro}Introduction}
 
 Tady bude krátký úvod do semestrální práce, motivace a cíle.
 
 %%%% -------------------------------------------------------- 
-\section{\label{SEC:Description}Popis algoritmu}
-%\section{\label{SEC:Description}Algorithm Description}
+%\section{\label{SEC:Description}Popis algoritmu}
+\section{\label{SEC:Description}Algorithm Description}
 
 Zkrácený slovní popis algoritmu, je možné použít i pseudokódy,
 například balík {\textsc algorithm2e.sty}, pak je nutné odkomentovat
@@ -103,8 +111,8 @@ Příklad pseudokódu algoritmu je uveden na obrázku~\ref{pseudo-code-rec}:
 Minimální délka popisu algoritmu 3/4 stránky.
 
 %%%% -------------------------------------------------------- 
-\section{\label{SEC:Pitfalls}Potíže při implementaci}
-%\section{\label{SEC:Pitfalls}Implementation details}
+%%\section{\label{SEC:Pitfalls}Potíže při implementaci}
+\section{\label{SEC:Pitfalls}Implementation details}
 
 Tady uvedete, co se Vám nedařilo a dařilo, s čím byly problémy a další
 záležitosti týkající se implementace semestrální práce, či problém
@@ -115,8 +123,8 @@ vypracovaní semestrální práce včetně tohoto reportu. Rozdělení práce
 mezi členy týmu, je-li úloha vypracována týmově.
 
 %%%% -------------------------------------------------------- 
-\section{\label{SEC:Results}Naměřené výsledky}
-%\section{\label{SEC:Results}Results}
+%\section{\label{SEC:Results}Naměřené výsledky}
+\section{\label{SEC:Results}Results}
 
 V této sekci budou tabulky, grafy, obrázky scén a text popisující
 naměřené výsledky. Nedílnou součástí této sekce bude komentář
@@ -186,15 +194,15 @@ Příklad vložení souboru PDF je uveden na obrázku~\ref{fig:fig1} a ~\ref{fig
 \end{figure*}
 
 %%%% -------------------------------------------------------- 
-\section{\label{SEC:Conclusion}Závěr}
-%\section{\label{SEC:Conclusion}Conclusion}
+%\section{\label{SEC:Conclusion}Závěr}
+\section{\label{SEC:Conclusion}Conclusion}
 
 V této části uvedete závěr, doporučení pro opakování implementace této
 semestrální práce, omezení implementace či co se nepodařilo.
 
 %%%% -------------------------------------------------------- 
-\section*{\label{SEC:ACK}Poděkování}
-%\section*{\label{SEC:ACK}Acknowledgment}
+%\section*{\label{SEC:ACK}Poděkování}
+\section*{\label{SEC:ACK}Acknowledgment}
 
 Práce je samostatná, ale pokud chcete někomu poděkovat například za
 to, že Vás poslouchal při předběžné prezentaci či za přečtení a
