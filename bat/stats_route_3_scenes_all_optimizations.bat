@@ -1,0 +1,3 @@
+Release\FrustumCulling.exe -u 0.02 -q -c 10000 -s scenes/city.obj -p ../stats/city.camroute -m ../stats/city_route.stats
+Release\FrustumCulling.exe -u 0.02 -q -c 10000 -s scenes/conference.obj -p ../stats/conference.camroute -m ../stats/conference_route.stats
+Release\FrustumCulling.exe -u 0.02 -q -c 10000 -s scenes/asianDragon.obj -p ../stats/asianDragon.camroute -m ../stats/asianDragon_route.stats

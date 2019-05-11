@@ -1,6 +1,6 @@
 #!/usr/bin/python
 primInLeafCount = 10000
-executable = "Release/FrustumCulling.exe"
+executable = "Release\FrustumCulling.exe"
 statsFilePath = "../stats/"
 
 viewNames = ["A10.view", "city_B.view", "conference_B.view", "teapots_B.view", "asianDragon_B.view", "fforest_B.view", "city2_B.view"]
