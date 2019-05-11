@@ -7,8 +7,8 @@
 Scene::Scene() {
 	// load and prepare shaders
 	_program = loadShaderProgram({
-			{ GL_VERTEX_SHADER, "shaders/pt.vert" },
-			{ GL_FRAGMENT_SHADER, "shaders/cameraLight.frag" },
+			{ GL_VERTEX_SHADER, "../data/shaders/pt.vert" },
+			{ GL_FRAGMENT_SHADER, "../data/shaders/cameraLight.frag" },
 			});
 	if(!_program)
 		std::cerr << "Failed to load shader program\n";

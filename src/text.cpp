@@ -142,8 +142,8 @@ void FontRenderer::initGL() {
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
 
 	_shaderProgram = loadShaderProgram({
-			{ GL_VERTEX_SHADER, "shaders/text.vert" },
-			{ GL_FRAGMENT_SHADER, "shaders/text.frag" },
+			{ GL_VERTEX_SHADER, "../data/shaders/text.vert" },
+			{ GL_FRAGMENT_SHADER, "../data/shaders/text.frag" },
 			});
 	if(!_shaderProgram)
 		std::cerr << "Failed to load shader program\n";
