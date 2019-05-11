@@ -6,10 +6,18 @@
 \usepackage{a4wide}
 \usepackage{ae}
 \usepackage[czech,english]{babel}
-\usepackage[cp1250]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage{pdfpages}
+
+% fix for: czech babel breaks cline and cmidrule
+\usepackage{regexpatch}
+\makeatletter
+% Change the `-` delimiter to an active character
+\xpatchparametertext\@@@cmidrule{-}{\cA-}{}{}
+\xpatchparametertext\@cline{-}{\cA-}{}{}
+\makeatother
 
 \paperwidth=210 true mm
 \paperheight=297 true mm
@@ -21,13 +29,13 @@
 % Pro anglictinu zakomentuj nasledujici radek
 \selectlanguage{czech}
 
-% Znakem procenta zacina komentovanı øádek
+% Znakem procenta zacina komentovanÃ½ Å™Ã¡dek
 
-%%%% Pokud chcete pouít k formátování pseudokódu balík algorithm2e,
-%%% odkomentujte jeden ze dvou následujících øádkù
+%%%% Pokud chcete pouÅ¾Ã­t k formÃ¡tovÃ¡nÃ­ pseudokÃ³du balÃ­k algorithm2e,
+%%% odkomentujte jeden ze dvou nÃ¡sledujÃ­cÃ­ch Å™Ã¡dkÅ¯
 %\usepackage[lined,linesnumbered]{algorithm2e}
 %\usepackage{algorithm2e}
-% Tento balík slouí pro vkládání obrázkù ve formátu EPS (encapsulated postscript)
+% Tento balÃ­k slouÅ¾Ã­ pro vklÃ¡dÃ¡nÃ­ obrÃ¡zkÅ¯ ve formÃ¡tu EPS (encapsulated postscript)
 %\usepackage{ctable}
 %\DeclareGraphicsExtensions{.pdf}
 
@@ -35,10 +43,10 @@
 
 \begin{frontmatter}
 
-\title{Zadání semestrální práce èíslo XXXX\\ název semestrální práce}
+\title{ZadÃ¡nÃ­ semestrÃ¡lnÃ­ prÃ¡ce ÄÃ­slo XXXX\\ nÃ¡zev semestrÃ¡lnÃ­ prÃ¡ce}
 
-\author{Josef Novák and Lukáš Novotnı\footnote{A4M39DPG -- Josef Novák a Lukáš Novotnı, letní semestr 2009/10}\\
-Katedra poèítaèové grafiky a interakce,\\ Fakulta elektrotechnická, ÈVUT Praha
+\author{Josef NovÃ¡k and LukÃ¡Å¡ NovotnÃ½\footnote{A4M39DPG -- Josef NovÃ¡k a LukÃ¡Å¡ NovotnÃ½, letnÃ­ semestr 2009/10}\\
+Katedra poÄÃ­taÄovÃ© grafiky a interakce,\\ Fakulta elektrotechnickÃ¡, ÄŒVUT Praha
 }
 
 \date{}
@@ -50,7 +58,7 @@ Katedra poèítaèové grafiky a interakce,\\ Fakulta elektrotechnická, ÈVUT Praha
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-  Tady bude zadání úlohy buï v èeštinì nebo angliètinì.
+  Tady bude zadÃ¡nÃ­ Ãºlohy buÄ v ÄeÅ¡tinÄ› nebo angliÄtinÄ›.
 \end{abstract}
 
   % Klicova slova k uloze
@@ -69,67 +77,67 @@ ray tracing, octrees, ...,
 %% \input{./section5.tex}
 
 %%%% -------------------------------------------------------- 
-\section{\label{SEC:Intro}Úvod}
+\section{\label{SEC:Intro}Ãšvod}
 %\section{\label{SEC:Intro}Introduction}
 
-Tady bude krátkı úvod do semestrální práce, motivace a cíle.
+Tady bude krÃ¡tkÃ½ Ãºvod do semestrÃ¡lnÃ­ prÃ¡ce, motivace a cÃ­le.
 
 %%%% -------------------------------------------------------- 
 \section{\label{SEC:Description}Popis algoritmu}
 %\section{\label{SEC:Description}Algorithm Description}
 
-Zkrácenı slovní popis algoritmu, je moné pouít i pseudokódy,
-napøíklad balík {\textsc algorithm2e.sty}, pak je nutné odkomentovat
-v~tomto souboru øádek:\\
+ZkrÃ¡cenÃ½ slovnÃ­ popis algoritmu, je moÅ¾nÃ© pouÅ¾Ã­t i pseudokÃ³dy,
+napÅ™Ã­klad balÃ­k {\textsc algorithm2e.sty}, pak je nutnÃ© odkomentovat
+v~tomto souboru Å™Ã¡dek:\\
 
 {\textsc \textbackslash usepackage\{algorithm2e\}}.\\
 
-Dokumentace k psaní pseudokódù na adrese:\\
+Dokumentace k psanÃ­ pseudokÃ³dÅ¯ na adrese:\\
 
 \url{http://www.ctan.org/tex-archive/macros/latex/contrib/algorithm2e/algorithm2e.pdf}
 
-Pøíklad pseudokódu algoritmu je uveden na obrázku~\ref{pseudo-code-rec}:
+PÅ™Ã­klad pseudokÃ³du algoritmu je uveden na obrÃ¡zku~\ref{pseudo-code-rec}:
 
 \input{rec.tex}
 
-Minimální délka popisu algoritmu 3/4 stránky.
+MinimÃ¡lnÃ­ dÃ©lka popisu algoritmu 3/4 strÃ¡nky.
 
 %%%% -------------------------------------------------------- 
-\section{\label{SEC:Pitfalls}Potíe pøi implementaci}
+\section{\label{SEC:Pitfalls}PotÃ­Å¾e pÅ™i implementaci}
 %\section{\label{SEC:Pitfalls}Implementation details}
 
-Tady uvedete, co se Vám nedaøilo a daøilo, s èím byly problémy a další
-záleitosti tıkající se implementace semestrální práce, èi problém
-ètení, konverze, èi nalezení vhodnıch dat pro úlohu. Dále kde jste
-strávili nejvíce èasu, kterou chybu v implementaci jste nejdéle
-hledali a podobnì. Èasové nároky v hodinách (hodina = 60 minut) pro
-vypracovaní semestrální práce vèetnì tohoto reportu. Rozdìlení práce
-mezi èleny tımu, je-li úloha vypracována tımovì.
+Tady uvedete, co se VÃ¡m nedaÅ™ilo a daÅ™ilo, s ÄÃ­m byly problÃ©my a dalÅ¡Ã­
+zÃ¡leÅ¾itosti tÃ½kajÃ­cÃ­ se implementace semestrÃ¡lnÃ­ prÃ¡ce, Äi problÃ©m
+ÄtenÃ­, konverze, Äi nalezenÃ­ vhodnÃ½ch dat pro Ãºlohu. DÃ¡le kde jste
+strÃ¡vili nejvÃ­ce Äasu, kterou chybu v implementaci jste nejdÃ©le
+hledali a podobnÄ›. ÄŒasovÃ© nÃ¡roky v hodinÃ¡ch (hodina = 60 minut) pro
+vypracovanÃ­ semestrÃ¡lnÃ­ prÃ¡ce vÄetnÄ› tohoto reportu. RozdÄ›lenÃ­ prÃ¡ce
+mezi Äleny tÃ½mu, je-li Ãºloha vypracovÃ¡na tÃ½movÄ›.
 
 %%%% -------------------------------------------------------- 
-\section{\label{SEC:Results}Namìøené vısledky}
+\section{\label{SEC:Results}NamÄ›Å™enÃ© vÃ½sledky}
 %\section{\label{SEC:Results}Results}
 
-V této sekci budou tabulky, grafy, obrázky scén a text popisující
-namìøené vısledky. Nedílnou souèástí této sekce bude komentáø
-k~namìøenım vısledkùm, napøíklad, jestli namìøená data odpovídají
-teorii. Pro rychlost algoritmu je dobrá varianta uvádìt èas zpracování
-na jeden dotaz, prùmìrnı poèet traverzaèních krokù na jeden dotaz,
-prùmìrnı poèet incidenèních operací na jeden dotaz, dále pak dobu
-stavby datové struktury a to v závislosti na vstupních datech (scénì)
-a nastavení algoritmu (hloubka stromu, ukonèující kritéria atd.). Je
-nutné uvést charakterizaci scény, alespoò poèet primitiv, objektù ve
-scénì.
+V tÃ©to sekci budou tabulky, grafy, obrÃ¡zky scÃ©n a text popisujÃ­cÃ­
+namÄ›Å™enÃ© vÃ½sledky. NedÃ­lnou souÄÃ¡stÃ­ tÃ©to sekce bude komentÃ¡Å™
+k~namÄ›Å™enÃ½m vÃ½sledkÅ¯m, napÅ™Ã­klad, jestli namÄ›Å™enÃ¡ data odpovÃ­dajÃ­
+teorii. Pro rychlost algoritmu je dobrÃ¡ varianta uvÃ¡dÄ›t Äas zpracovÃ¡nÃ­
+na jeden dotaz, prÅ¯mÄ›rnÃ½ poÄet traverzaÄnÃ­ch krokÅ¯ na jeden dotaz,
+prÅ¯mÄ›rnÃ½ poÄet incidenÄnÃ­ch operacÃ­ na jeden dotaz, dÃ¡le pak dobu
+stavby datovÃ© struktury a to v zÃ¡vislosti na vstupnÃ­ch datech (scÃ©nÄ›)
+a nastavenÃ­ algoritmu (hloubka stromu, ukonÄujÃ­cÃ­ kritÃ©ria atd.). Je
+nutnÃ© uvÃ©st charakterizaci scÃ©ny, alespoÅˆ poÄet primitiv, objektÅ¯ ve
+scÃ©nÄ›.
 
-Dále je nezbytné uvést konfiguraci poèítaèe, na kterém probíhalo
-testování, tedy typ procesoru (pøípadnì poèet procesorù), taktovací
-frekvenci, poèet jader pouitıch v implementaci, velikost vyrovnávací
-pamìti (cache) procesoru, operaèní systém pouitı bìhem testování
-(32/64 bit), velikost hlavní pamìti, typ a verzi kompilátoru,
-pøepínaèe kompilátoru pouité pro pøeklad programu pro úèely mìøení
-vısledkù a další.\\
+DÃ¡le je nezbytnÃ© uvÃ©st konfiguraci poÄÃ­taÄe, na kterÃ©m probÃ­halo
+testovÃ¡nÃ­, tedy typ procesoru (pÅ™Ã­padnÄ› poÄet procesorÅ¯), taktovacÃ­
+frekvenci, poÄet jader pouÅ¾itÃ½ch v implementaci, velikost vyrovnÃ¡vacÃ­
+pamÄ›ti (cache) procesoru, operaÄnÃ­ systÃ©m pouÅ¾itÃ½ bÄ›hem testovÃ¡nÃ­
+(32/64 bit), velikost hlavnÃ­ pamÄ›ti, typ a verzi kompilÃ¡toru,
+pÅ™epÃ­naÄe kompilÃ¡toru pouÅ¾itÃ© pro pÅ™eklad programu pro ÃºÄely mÄ›Å™enÃ­
+vÃ½sledkÅ¯ a dalÅ¡Ã­.\\
 
-Pøíklad formátování tabulky viz tabulka \ref{tab:tab1}.
+PÅ™Ã­klad formÃ¡tovÃ¡nÃ­ tabulky viz tabulka \ref{tab:tab1}.
 
 \begin{table*}[t]\footnotesize
 \begin{center}
@@ -154,18 +162,18 @@ Buddha & $212\times512\times212$ & 15.81 & 96 & 24.6 & 19.63 &  84 & 26.0 & -5.9
 \end{tabular}
 \end{center}
 \vspace*{0mm}
-\caption{{\label{tab:tab1}}Pøíklad tabulky. Další popis i upøesnìní
-  parametrù mùe následovat v této legendì.}
+\caption{{\label{tab:tab1}}PÅ™Ã­klad tabulky. DalÅ¡Ã­ popis i upÅ™esnÄ›nÃ­
+  parametrÅ¯ mÅ¯Å¾e nÃ¡sledovat v tÃ©to legendÄ›.}
 \vspace*{0mm}
 \label{shadowtable}
 \end{table*}
 
-Pøíklad vloení souboru PDF je uveden na obrázku~\ref{fig:fig1} a ~\ref{fig:fig2}.
+PÅ™Ã­klad vloÅ¾enÃ­ souboru PDF je uveden na obrÃ¡zku~\ref{fig:fig1} a ~\ref{fig:fig2}.
 
 \begin{figure*}[!ht]
 \begin{center}
   \includegraphics[width=0.3\textwidth]{cvut-logo-bw}
-\caption{{\label{fig:fig1}}Pøíklad vloeného obrázku v PDF.}
+\caption{{\label{fig:fig1}}PÅ™Ã­klad vloÅ¾enÃ©ho obrÃ¡zku v PDF.}
 \end{center}
 \end{figure*}
 
@@ -173,24 +181,24 @@ Pøíklad vloení souboru PDF je uveden na obrázku~\ref{fig:fig1} a ~\ref{fig:fig2
 \begin{center}
   \includegraphics[width=0.3\textwidth]{cvut-logo-bw}
   \includegraphics[width=0.3\textwidth]{cvut-logo-bw}
-\caption{{\label{fig:fig2}}Pøíklad vloenıch obrázkù v PDF vedle sebe.}
+\caption{{\label{fig:fig2}}PÅ™Ã­klad vloÅ¾enÃ½ch obrÃ¡zkÅ¯ v PDF vedle sebe.}
 \end{center}
 \end{figure*}
 
 %%%% -------------------------------------------------------- 
-\section{\label{SEC:Conclusion}Závìr}
+\section{\label{SEC:Conclusion}ZÃ¡vÄ›r}
 %\section{\label{SEC:Conclusion}Conclusion}
 
-V této èásti uvedete závìr, doporuèení pro opakování implementace této
-semestrální práce, omezení implementace èi co se nepodaøilo.
+V tÃ©to ÄÃ¡sti uvedete zÃ¡vÄ›r, doporuÄenÃ­ pro opakovÃ¡nÃ­ implementace tÃ©to
+semestrÃ¡lnÃ­ prÃ¡ce, omezenÃ­ implementace Äi co se nepodaÅ™ilo.
 
 %%%% -------------------------------------------------------- 
-\section*{\label{SEC:ACK}Podìkování}
+\section*{\label{SEC:ACK}PodÄ›kovÃ¡nÃ­}
 %\section*{\label{SEC:ACK}Acknowledgment}
 
-Práce je samostatná, ale pokud chcete nìkomu podìkovat napøíklad za
-to, e Vás poslouchal pøi pøedbìné prezentaci èi za pøeètení a
-kontrolu této zprávy a nalezení nìkterıch chyb, tak to tady uveïte.
+PrÃ¡ce je samostatnÃ¡, ale pokud chcete nÄ›komu podÄ›kovat napÅ™Ã­klad za
+to, Å¾e VÃ¡s poslouchal pÅ™i pÅ™edbÄ›Å¾nÃ© prezentaci Äi za pÅ™eÄtenÃ­ a
+kontrolu tÃ©to zprÃ¡vy a nalezenÃ­ nÄ›kterÃ½ch chyb, tak to tady uveÄte.
 
 %******************************************************************
 % Tady nasleduje seznam literatury a to bud s pouzitim
@@ -208,30 +216,30 @@ kontrolu této zprávy a nalezení nìkterıch chyb, tak to tady uveïte.
 \begin{thebibliography}{10}
 
 \bibitem[1]{Latex}
-A. Balvínová a M. Bílı.
-\newblock Textové informaèní systémy, sázecí systém \LaTeX, cvièení.
-Skripta ÈVUT-FEL, 1995.
+A. BalvÃ­novÃ¡ a M. BÃ­lÃ½.
+\newblock TextovÃ© informaÄnÃ­ systÃ©my, sÃ¡zecÃ­ systÃ©m \LaTeX, cviÄenÃ­.
+Skripta ÄŒVUT-FEL, 1995.
 
 \bibitem[2]{Danco}
-V. Danèo.
-\newblock Kapesní prùvodce poèítaèovou typografií. Nakladatelství
+V. DanÄo.
+\newblock KapesnÃ­ prÅ¯vodce poÄÃ­taÄovou typografiÃ­. NakladatelstvÃ­
 Labyrint, Praha 1995.
 
 \bibitem[3]{Rybicka}
-J. Rybièka.
-\newblock \LaTeX\/ pro zaèáteèníky. Nakladatelství Konvoj, 1999.
+J. RybiÄka.
+\newblock \LaTeX\/ pro zaÄÃ¡teÄnÃ­ky. NakladatelstvÃ­ Konvoj, 1999.
 
 \bibitem[4]{GRUBER}
 D. Gruber.
-\newblock Kdo to má všechno èíst, Nakladatelství Gruber, 1991.
+\newblock Kdo to mÃ¡ vÅ¡echno ÄÃ­st, NakladatelstvÃ­ Gruber, 1991.
 (ISBN 80-900680-1-4).
 
-\bibitem[5]{CSTUG} CSTUG: Úvod do \LaTeX{u}.
+\bibitem[5]{CSTUG} CSTUG: Ãšvod do \LaTeX{u}.
 \newblock
-\url{http://www.cstug.cz/latex/lm/frames.html}. Stránky z~roku 2009.
+\url{http://www.cstug.cz/latex/lm/frames.html}. StrÃ¡nky z~roku 2009.
 
 \bibitem[6]{CSTUGDOC}
-CSTUG: Dokumentace a manuály k \LaTeX{u}.
+CSTUG: Dokumentace a manuÃ¡ly k \LaTeX{u}.
 \newblock \url{http://www.cstug.cz/documentation/index.html}
 
 \end{thebibliography}

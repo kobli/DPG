@@ -19,7 +19,7 @@ all: ${TARGET}.pdf
 # 	-dGrayImageFilter=/FlateEncode -dMonoImageFilter=/FlateEncode \
 # 	${TARGET}.ps ${TARGET}.pdf
 
-${TARGET}.pdf :
+${TARGET}.pdf : ${SOURCES}
 	pdflatex ${TARGET}
 
 bib:
