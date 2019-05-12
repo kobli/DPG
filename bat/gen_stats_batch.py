@@ -1,5 +1,5 @@
 #!/usr/bin/python
-primInLeafCount = 10000
+primInLeafCount = 10
 executable = "Release\FrustumCulling.exe"
 statsFilePath = "../stats/"
 
