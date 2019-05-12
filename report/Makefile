@@ -21,6 +21,7 @@ all: ${TARGET}.pdf
 
 ${TARGET}.pdf : ${SOURCES}
 	pdflatex ${TARGET}
+	pdflatex ${TARGET}
 
 bib:
 	bibtex ${TARGET}
