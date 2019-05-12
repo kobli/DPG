@@ -12,6 +12,7 @@
 \usepackage{pdfpages}
 \usepackage{pgfplots}
 \usepackage{diagbox}
+\usepackage{float}
 
 % fix for: czech babel breaks cline and cmidrule
 \usepackage{regexpatch}
@@ -131,7 +132,9 @@ mezi členy týmu, je-li úloha vypracována týmově.
 %%%% -------------------------------------------------------- 
 %\section{\label{SEC:Results}Naměřené výsledky}
 \section{\label{SEC:Results}Results}
+First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be chosen. If it is too high, fewer nodes will be created and the culling will be faster, but less accurate and therefore more excess triangles will be sent for rendering, increasing the draw time. Figure \ref{GRAPH:mtpl} demonstrates that. Based on it, the \emph{MTPL} value was chosen to be $10^{4}$.
 
+\begin{figure}[H]
 \begin{tikzpicture}
 \begin{axis}[
     enlargelimits=false,
@@ -163,46 +166,42 @@ mezi členy týmu, je-li úloha vypracována týmově.
 
 \end{axis}
 \end{tikzpicture}
+\caption{Scene draw time and BVH traverse time based on chosen \emph{MTPL} value. The samples for each \emph{MTPL} value were obtained using the same set of camera views in the Asian dragon scene.}
+\label{GRAPH:mtpl}
+\end{figure}
 
+Now the culling optimization techniques can be evaluated. Table \ref{TAB:optim} shows speedups of each technique tested separately and all at once against the basic version of the algorithm. The culling time speedups were calculated from averages of circa 60 values, which were measured over one second using included camera view configurations.
+
+Evaluation
 
 \begin{table*}[t]
 \begin{center}
 \begin{tabular}{| r || r | r | r | r | r | r | r |}
 	\hline
 	Scene                                   & A10 & Asian dragon & city2 & city & conference & forest & teapots \\
-	\#\,tris.                               & 219k & 7220k & 75k & 68k & 283k & 174k & 201k \\
+	\#\,tris.                               & 219\,k & 7220\,k & 75\,k & 68\,k & 283\,k & 174\,k & 201\,k \\
 	\#\,nodes                               & 101 & 2221 & 23 & 29 & 147 & 73 & 61 \\
 	\#\,trav. nodes                         & 15  & 115  & 21 & 17 & 75  & 35 & 55 \\
-	\diagbox{Optimization}{} &&&&&&& \\
+	\diagbox[width=10em]{\\Optimization}{} &&&&&&& \\
 \hline
 \hline
-	None            & & & & & & & \\
+	Plane masking                           & 1.1 & 0.7 & 0.8 & 0.8 & 1.0 & 2.7 & 1.3 \\
 \hline
-	Plane masking   & & & & & & & \\
+	Plane coherency                         & 2.3 & 0.9 & 0.4 & 0.6 & 1.1 & 1.3 & 1.8 \\
 \hline
-	Plane coherency & & & & & & & \\
+	Octant test                             & 1.1 & 0.5 & 1.2 & 0.5 & 1.6 & 1.0 & 1.2 \\
 \hline
-	Octant test     & & & & & & & \\
-\hline
-	All             & & & & & & & \\
+	All                                     & 1.3 & 1.0 & 0.9 & 0.7 & 0.6 & 0.9 & 0.8 \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Vief frustum culling times at selected views.}
+	\caption{Vief frustum culling speedups for individual and all optimization techniques (compared against no optimization) at selected views.}
+	\label{TAB:optim}
 \end{table*}
 
-V této sekci budou tabulky, grafy, obrázky scén a text popisující
-naměřené výsledky. Nedílnou součástí této sekce bude komentář
-k~naměřeným výsledkům, například, jestli naměřená data odpovídají
-teorii. Pro rychlost algoritmu je dobrá varianta uvádět čas zpracování
-na jeden dotaz, průměrný počet traverzačních kroků na jeden dotaz,
-průměrný počet incidenčních operací na jeden dotaz, dále pak dobu
-stavby datové struktury a to v závislosti na vstupních datech (scéně)
-a nastavení algoritmu (hloubka stromu, ukončující kritéria atd.). Je
-nutné uvést charakterizaci scény, alespoň počet primitiv, objektů ve
-scéně.
 
-Dále je nezbytné uvést konfiguraci počítače, na kterém probíhalo
+
+konfigurace počítače, na kterém probíhalo
 testování, tedy typ procesoru (případně počet procesorů), taktovací
 frekvenci, počet jader použitých v implementaci, velikost vyrovnávací
 paměti (cache) procesoru, operační systém použitý během testování
