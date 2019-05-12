@@ -1,0 +1,2 @@
+# print stats file name + avg draw time for every view
+for file in `ls | egrep '*_[olm]*.stats'`; do echo "$file `cat "$file" |cut -d ' ' -f8 | awk '{ total += $0; count++ } END { print total/count }' -`"; done
