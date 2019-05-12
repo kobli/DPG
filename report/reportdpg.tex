@@ -172,7 +172,7 @@ First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be c
 
 Now the culling optimization techniques can be evaluated. Table \ref{TAB:optim} shows speedups of each technique tested separately and all at once against the basic version of the algorithm. The culling time speedups were calculated from averages of circa 60 values, which were measured over one second using included camera view configurations. The \emph{MTPL} value was set to 10 to increase the number of generated nodes and improve the accuracy of measurements of traversal efficiency.
 
-The obtained results are unclear. In \emph{A10} and \emph{forest} scenes all techniques produce a slowdown. Another odd behaviour occurs in \emph{city} and \emph{conference} scenes, where each technique separately results in a speedup, while when combined together they cause a slowdown. The reason for this might be either inaccurate measurements, or suboptimal implementation. After setting \emph{MTPL} to 10, the culling time is mostly in order of hundreds of microseconds, falling to tens for the \emph{A10} scene where only few nodes are visited.
+The obtained results are unclear. In \emph{A10} and \emph{forest} scenes all techniques produce a slowdown. Another odd behaviour occurs in \emph{city} and \emph{conference} scenes, where each technique separately results in a speedup, but when combined together they cause a slowdown. The reason for this might be either inaccurate measurements, or suboptimal implementation. After setting \emph{MTPL} to 10, the culling time is mostly in order of hundreds of microseconds, falling to tens for the \emph{A10} scene where only few nodes are visited (which is likely the cause of inaccuracy on this scene).
 
 \begin{table*}[t]
 \begin{center}
@@ -218,26 +218,58 @@ Table \ref{TAB:configuration} contains the software and hardware configuration t
 \end{tabular}
 \end{center}
 	\caption{Hardware and software configuration used for measurements.}
-	\label{TAB:optim}
+	\label{TAB:configuration}
 \end{table*}
 
+\begin{figure}[H]
+	\begin{tikzpicture}[]
+\pgfplotsset{set layers}
+\begin{axis}[
+		width=0.8\textwidth,
+		scale only axis,
+		axis y line*=left,
+		legend pos=north west,
+		no markers,
+		xlabel={Route interpolation parameter (camera position and direction)},
+		ylabel={BVH traverse time $[ms]$},
+		xmin = 0,
+		xmax = 1,
+]
+\addplot+[black,dashed] table [x index=0,y index=7]{../stats/asianDragon_route_100.stats};
+\addlegendentry{No optimizations}
 
-Příklad vložení souboru PDF je uveden na obrázku~\ref{fig:fig1} a ~\ref{fig:fig2}.
+\addplot+[red] table [x index=0,y index=7]{../stats/asianDragon_route_100_l.stats};
+\addlegendentry{Plane coherency}
 
-\begin{figure*}[!ht]
-\begin{center}
-  \includegraphics[width=0.3\textwidth]{cvut-logo-bw}
-\caption{{\label{fig:fig1}}Příklad vloženého obrázku v PDF.}
-\end{center}
-\end{figure*}
+\addplot+[green] table [x index=0,y index=7]{../stats/asianDragon_route_100_m.stats};
+\addlegendentry{Plane masking}
 
-\begin{figure*}[!ht]
-\begin{center}
-  \includegraphics[width=0.3\textwidth]{cvut-logo-bw}
-  \includegraphics[width=0.3\textwidth]{cvut-logo-bw}
-\caption{{\label{fig:fig2}}Příklad vložených obrázků v PDF vedle sebe.}
-\end{center}
-\end{figure*}
+\addplot+[blue] table [x index=0,y index=7]{../stats/asianDragon_route_100_o.stats};
+\addlegendentry{Octant test}
+
+\addplot+[black] table [x index=0,y index=7]{../stats/asianDragon_route_100_olm.stats};
+\addlegendentry{All optimizations}
+\end{axis}
+
+\begin{axis}[
+		width=0.8\textwidth,
+		scale only axis,
+		axis y line*=right,
+		ylabel near ticks,
+		yticklabel pos=right,
+		axis x line=none,
+		no markers,
+		ylabel={\#\,trav. nodes},
+		xmin = 0,
+		xmax = 1,
+]
+\addplot+[opacity=0,fill=black,fill opacity=0.1] table [x index=0,y index=5]{../stats/asianDragon_route_100.stats};
+\end{axis}
+
+\end{tikzpicture}
+	\caption{Comparison of culling optimizations effectivity during camera flythrough in \emph{Asian dragon} scene.}
+\label{GRAPH:dragon_route}
+\end{figure}
 
 %%%% -------------------------------------------------------- 
 %\section{\label{SEC:Conclusion}Závěr}
