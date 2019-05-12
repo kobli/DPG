@@ -10,6 +10,8 @@
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage{pdfpages}
+\usepackage{pgfplots}
+\usepackage{diagbox}
 
 % fix for: czech babel breaks cline and cmidrule
 \usepackage{regexpatch}
@@ -130,6 +132,65 @@ mezi členy týmu, je-li úloha vypracována týmově.
 %\section{\label{SEC:Results}Naměřené výsledky}
 \section{\label{SEC:Results}Results}
 
+\begin{tikzpicture}
+\begin{axis}[
+    enlargelimits=false,
+		only marks,
+		xlabel={Draw time $[ms]$},
+		ylabel={BVH traverse time $[ms]$},
+		ymax = 0.3,
+		xmin = 0.1,
+		xmax = 3,
+		yticklabel style={/pgf/number format/fixed}
+]
+\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_100.stats};
+\addlegendentry{$10^{2}$}
+
+\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_1000.stats};
+\addlegendentry{$10^{3}$}
+
+\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_10000.stats};
+\addlegendentry{$10^{4}$}
+
+\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_100000.stats};
+\addlegendentry{$10^{5}$}
+
+\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_1000000.stats};
+\addlegendentry{$10^{6}$}
+
+\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_10000000.stats};
+\addlegendentry{$10^{7}$}
+
+\end{axis}
+\end{tikzpicture}
+
+
+\begin{table*}[t]
+\begin{center}
+\begin{tabular}{| r || r | r | r | r | r | r | r |}
+	\hline
+	Scene                              & & & & & & & \\
+	\#\,tris.                          & & & & & & & \\
+	\#\,nodes                          & & & & & & & \\
+	\#\,trav. nodes                    & & & & & & & \\
+	\diagbox{Optimization}{tree depth} & & & & & & & \\
+\hline
+\hline
+	None            & & & & & & & \\
+\hline
+	Plane masking   & & & & & & & \\
+\hline
+	Plane coherency & & & & & & & \\
+\hline
+	Octant test     & & & & & & & \\
+\hline
+	All             & & & & & & & \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Vief frustum culling times at selected views.}
+\end{table*}
+
 V této sekci budou tabulky, grafy, obrázky scén a text popisující
 naměřené výsledky. Nedílnou součástí této sekce bude komentář
 k~naměřeným výsledkům, například, jestli naměřená data odpovídají
@@ -148,37 +209,6 @@ paměti (cache) procesoru, operační systém použitý během testování
 (32/64 bit), velikost hlavní paměti, typ a verzi kompilátoru,
 přepínače kompilátoru použité pro překlad programu pro účely měření
 výsledků a další.\\
-
-Příklad formátování tabulky viz tabulka \ref{tab:tab1}.
-
-\begin{table*}[t]\footnotesize
-\begin{center}
-\begin{tabular}{| c | c || r | r | r || r | r | r | r |}
-\hline
-          &               &   \multicolumn{3}{c||}{no acceleration}     &   \multicolumn{4}{c|}{n=12}  \\
-\cline{3-9}
-          &                 & \#trav. & \#isect. &      & \#trav. & \#isect. &  & \\
-model & resolution &  steps    &    tests   & time  & steps    &    tests   & time   &  speedup \\
-          &                  & $[per~ray]$ &  $ [per~ray]$   & [ms]  &$ [per~ray]$    &   $[per~ray]$   & [ms]  & [\%]  \\
-\hline
-\hline
-Bunny & $128\times128\times100$ & 76.39 & 529 & 66.4 & 82.59 &  348 & 59.4 & 10.5 \\ \hline
-Bunny & $256\times256\times200$ & 111.53 & 542 & 82.8 & 116.63 &  345 & 72.8 & 12.2 \\ \hline
-Bunny & $512\times508\times400$ & 185.86 & 472 & 123.4 & 191.37 &  292 & 108.9 & 11.7 \\ \hline
-Dragon & $128\times92\times60$ & 66.94 & 426 & 56.6 & 81.45 &  365 & 56.7 & -0.2 \\ \hline
-Dragon & $256\times184\times116$ & 97.08 & 433 & 68.6 & 107.91 &  333 & 64.7 & 5.7 \\ \hline
-Dragon &  $512\times364\times232$ & 15.81 & 377 & 96.5 & 166.93 &  264 & 87.0 & 9.9 \\ \hline
-Buddha & $56\times128\times56$ & 7.34 & 104 & 16.6 & 10.15 &  100 & 17.9 & -7.9 \\ \hline
-Buddha & $108\times256\times108$ & 11.10 & 116 & 19.7 & 14.71 &  107 & 21.2 & -7.6 \\ \hline
-Buddha & $212\times512\times212$ & 15.81 & 96 & 24.6 & 19.63 &  84 & 26.0 & -5.9 \\ \hline
-\end{tabular}
-\end{center}
-\vspace*{0mm}
-\caption{{\label{tab:tab1}}Příklad tabulky. Další popis i upřesnění
-  parametrů může následovat v této legendě.}
-\vspace*{0mm}
-\label{shadowtable}
-\end{table*}
 
 Příklad vložení souboru PDF je uveden na obrázku~\ref{fig:fig1} a ~\ref{fig:fig2}.
 
