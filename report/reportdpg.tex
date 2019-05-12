@@ -99,7 +99,7 @@ The goal of this project is to create an efficient implementation of a frustum c
 \subsection{Building the BVH}
 First, the BVH must be built. The top-down method is used, which means that all triangles are put into a single node, the root, and the nodes are recursively split in two by dividing the triangles inside the node into two groups, according to chosen scheme. Each group is then passed to the newly created child node. This process is repeated until each node contains fewer triangles than specified threshold.
 
-The chosen subdivision scheme is midpoint subdivision, which first calculates a midpoint and extents from triangle centroids along each axis and chooses the splitting axis as the one with largest extent, thus forming a splitting plane, which is perpendicular to this axis and contains the midpoint. Then it divides the primitives into two groups based on the position of their centroids relative to the splitting plane.
+The chosen subdivision scheme is midpoint subdivision \cite{Pharr}, which first calculates a midpoint and extents from triangle centroids along each axis and chooses the splitting axis as the one with largest extent, thus forming a splitting plane, which is perpendicular to this axis and contains the midpoint. Then it divides the primitives into two groups based on the position of their centroids relative to the splitting plane.
 
 The shape of the tree is not known in advance, so it is easier to use the dynamic representation where each node is allocated separately and the children are linked by pointers. This is however not suitable for traversal because the nodes are not stored on subsequent memory locations, so the they can not be loaded into cache in advance. Also the pointers waste space in cache. To avoid this, the tree is transformed into an array representation, where left child is always the following node in the array and the index of the right child is stored inside the node. Therefore the order of nodes in the array corresponds to the DFS pre-order traversal.
 
@@ -109,13 +109,13 @@ By using a hierarchical data structure it is possible to lower the computational
 \subsection{Frustum\,-\,box intersection test}
 One approach to this problem is to transform the frustum into perspective coordinate system, therefore it becomes a box. Each bounding volume also has to be transformed, in case of AABB it means to transform all eight vertices and construct their AABB. Thus the problem becomes an intersection test of two AABBs, which can be solved by six comparisons. This approach pays most of its price on the vertex transformations, leaving no room for optimizations.
 
-Second approach, the one used in this project, is to test the box against each of the frustum planes, either in world space or in model space.\footnote{The tests must be done in model space if the object transformation changes, so the BVH does not have to be rebuilt. Also if there are multiple objects with different transforms, the same BVH can be used for all of them.} It offers more room for optimizations, which will be described in further sections.
+Second approach, the one used in this project, is to test the box against each of the frustum planes, either in world space or in model space.\footnote{The tests must be done in model space if the object transformation changes, so the BVH does not have to be rebuilt. Also if there are multiple objects with different transforms, the same BVH can be used for all of them.} It offers more room for optimizations, which will be described in further sections. More detailed description of both methods can be found in \cite{Assarsson}. The planes in world-space can be extracted from view-projection matrix by an algorithm described in \cite{Gribb}. Analogically, the planes in model-space can be extracted using the exactly same algorithm from model-view-projection matrix.
 
 \subsection{Efficient plane\,-\,box intersection test}
 Exact test cosists of testing position of eight points against a plane, meaning eight dot products and comparisons. There is a more efficient conservative algorithm, which can be used instead.\footnote{A conservative algorithm can be used, because when the result of the test is \emph{intersecting} instead of \emph{outside}, the only consequence is that the children will be tested as well.} The idea is that it is sufficient to test the two vertices that lie on the diagonal which is best aligned with the normal of the plane. They can be found by using the binary encoded signs of components of the plane normal vector as index into a lookup table. The vertex farther along the normal is called \emph{p-vertex}, the other one \emph{n-vertex}. If the \emph{n-vertex} is inside the plane, then the box is inside. Else if the \emph{p-vertex} is inside the plane, then the box is intersecting the plane. Otherwise it is outside the plane. The indices of the \emph{p-} and \emph{n- vertices} are the same for a given plane and all AABBs.
 
 \subsection{Culling optimization techniques}
-There are several possible optimizations. \emph{Plane masking} exploits the hierarchical structure -- when a node is inside a plane, all the child nodes must also be inside that plane, therefore the tests against those planes can be skipped. \emph{Plane coherency} tries to end the testing of box against set of plains earlier by starting with the plane the box was outside of last time. \emph{Octant test} is usable only for symetric frustum (meaning horizontal and vertical field of view is the same) and only if the radius of the bounding sphere of a node is not greater than the smallest distance from frustum center to any of its planes. It works by splitting the frustum into eight symetric octants, identifying the octant that contains the centroid of the node bounding sphere (or bounding sphere of the AABB, which may give a worse fit) and testing only against the three outer planes of that octant.
+There are several possible optimizations, as described in \cite{Assarsson}. \emph{Plane masking} exploits the hierarchical structure -- when a node is inside a plane, all the child nodes must also be inside that plane, therefore the tests against those planes can be skipped. \emph{Plane coherency} tries to end the testing of box against set of plains earlier by starting with the plane the box was outside of last time. \emph{Octant test} is usable only for symetric frustum (meaning horizontal and vertical field of view is the same) and only if the radius of the bounding sphere of a node is not greater than the smallest distance from frustum center to any of its planes. It works by splitting the frustum into eight symetric octants, identifying the octant that contains the centroid of the node bounding sphere (or bounding sphere of the AABB, which may give a worse fit) and testing only against the three outer planes of that octant.
 
 %%%% -------------------------------------------------------- 
 %%\section{\label{SEC:Pitfalls}Potíže při implementaci}
@@ -274,7 +274,7 @@ Table \ref{TAB:configuration} contains the software and hardware configuration t
 %%%% -------------------------------------------------------- 
 %\section{\label{SEC:Conclusion}Závěr}
 \section{\label{SEC:Conclusion}Conclusion}
-A frustum culling algorithm has been implemented, including a simple method for BVH construction. It might be useful to compare the efficiency with an existing implementation. Three optimization techniques for frustum culling were described and evaluated: \emph{plane masking}, \emph{plane coherency}, \emph{octant test}. From the measured results it seems that only \emph{plane masking} offers some improvements, which is the exact opposite than what Assarsson and Möller \cite{TODO} found almost 20 years ago. It is possible that the implementatin of the other two techniques could be improved. The measured results on the \emph{forest} scene should be further investigated. 
+A frustum culling algorithm has been implemented, including a simple method for BVH construction. It might be useful to compare the efficiency with an existing implementation. Three optimization techniques for frustum culling were described and evaluated: \emph{plane masking}, \emph{plane coherency}, \emph{octant test}. From the measured results it seems that only \emph{plane masking} offers some improvements, which is the exact opposite than what Assarsson and Möller \cite{Assarsson} found almost 20 years ago. It is possible that the implementatin of the other two techniques could be improved. The measured results on the \emph{forest} scene should be further investigated. 
 
 %%%% -------------------------------------------------------- 
 %\section*{\label{SEC:ACK}Poděkování}
@@ -295,32 +295,17 @@ A frustum culling algorithm has been implemented, including a simple method for 
 \renewcommand\bibname{References}
 \begin{thebibliography}{10}
 
-\bibitem[1]{Latex}
-A. Balvínová a M. Bílý.
-\newblock Textové informační systémy, sázecí systém \LaTeX, cvičení.
-Skripta ČVUT-FEL, 1995.
+\bibitem[1]{Assarsson}
+Assarsson, Ulf, and Tomas Moller.
+\newblock "Optimized view frustum culling algorithms for bounding boxes." Journal of graphics tools 5.1 (2000): 9-22.
 
-\bibitem[2]{Danco}
-V. Dančo.
-\newblock Kapesní průvodce počítačovou typografií. Nakladatelství
-Labyrint, Praha 1995.
+\bibitem[2]{Gribb}
+Gribb, Gil, and Klaus Hartmann.
+\newblock "Fast extraction of viewing frustum planes from the world-view-projection matrix, 2001." URL http://www. cs. otago. ac. nz/postgrads/alexis/planeExtraction. pdf (2004).
 
-\bibitem[3]{Rybicka}
-J. Rybička.
-\newblock \LaTeX\/ pro začátečníky. Nakladatelství Konvoj, 1999.
-
-\bibitem[4]{GRUBER}
-D. Gruber.
-\newblock Kdo to má všechno číst, Nakladatelství Gruber, 1991.
-(ISBN 80-900680-1-4).
-
-\bibitem[5]{CSTUG} CSTUG: Úvod do \LaTeX{u}.
-\newblock
-\url{http://www.cstug.cz/latex/lm/frames.html}. Stránky z~roku 2009.
-
-\bibitem[6]{CSTUGDOC}
-CSTUG: Dokumentace a manuály k \LaTeX{u}.
-\newblock \url{http://www.cstug.cz/documentation/index.html}
+\bibitem[3]{Pharr}
+Pharr, Matt, Wenzel Jakob, and Greg Humphreys
+\newblock "Physically Based Rendering: From Theory To Implementation" [online]
 
 \end{thebibliography}
 
