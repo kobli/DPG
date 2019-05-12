@@ -120,14 +120,11 @@ There are several possible optimizations. \emph{Plane masking} exploits the hier
 %%%% -------------------------------------------------------- 
 %%\section{\label{SEC:Pitfalls}Potíže při implementaci}
 \section{\label{SEC:Pitfalls}Implementation details}
+The most annoying part of the project was getting it to compile on Windows. It took me around three hours to setup the project with all the dependencies and resolve name collisions with Windows constants and macros. Also on Windows some destructors were not called after closing the application window, which was solved by passing an option to GLUT to not terminate after the window is closed but rather only exit the main loop. The most tricky to find programming error was switched function arguments. Worse than that was a false assumption about the \emph{octant test}, that the planes it eliminates from testing can also be masked out from the child nodes. This is not true, because the bounding volume can also intersect those, meaning the children can intersect them as well.
 
-Tady uvedete, co se Vám nedařilo a dařilo, s čím byly problémy a další
-záležitosti týkající se implementace semestrální práce, či problém
-čtení, konverze, či nalezení vhodných dat pro úlohu. Dále kde jste
-strávili nejvíce času, kterou chybu v implementaci jste nejdéle
-hledali a podobně. Časové nároky v hodinách (hodina = 60 minut) pro
-vypracovaní semestrální práce včetně tohoto reportu. Rozdělení práce
-mezi členy týmu, je-li úloha vypracována týmově.
+I had a problem with two provided scenes: \emph{sibenik} and \emph{park}. The obj loader crashes while trying to load them, so I would have to either fix it (the code is quite bad -- I should have checked it before trying to use it) or find a different loader.
+
+The total time spent on the project is likely around 80 hours, including this report, but not counting the preparation of presentations. I had some code to start with from a previous project, but it had to be refactored and quite extensively so starting from scratch would likely not add much time.
 
 %%%% -------------------------------------------------------- 
 %\section{\label{SEC:Results}Naměřené výsledky}
@@ -135,8 +132,10 @@ mezi členy týmu, je-li úloha vypracována týmově.
 First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be chosen. If it is too high, fewer nodes will be created and the culling will be faster, but less accurate and therefore more excess triangles will be sent for rendering, increasing the draw time. Figure \ref{GRAPH:mtpl} demonstrates that. Based on it, the \emph{MTPL} value was chosen to be $10^{4}$.
 
 \begin{figure}[H]
+\begin{center}
 \begin{tikzpicture}
 \begin{axis}[
+		width=0.6\textwidth,
     enlargelimits=false,
 		only marks,
 		xlabel={Draw time $[ms]$},
@@ -166,19 +165,20 @@ First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be c
 
 \end{axis}
 \end{tikzpicture}
-\caption{Scene draw time and BVH traverse time based on chosen \emph{MTPL} value. The samples for each \emph{MTPL} value were obtained using the same set of camera views in the Asian dragon scene.}
+\caption{Scene draw time and BVH traverse time based on chosen \emph{MTPL} value. The samples for each \emph{MTPL} value were obtained using the same set of camera views in the asian dragon scene.}
 \label{GRAPH:mtpl}
+\end{center}
 \end{figure}
 
 Now the culling optimization techniques can be evaluated. Table \ref{TAB:optim} shows speedups of each technique tested separately and all at once against the basic version of the algorithm. The culling time speedups were calculated from averages of circa 60 values, which were measured over one second using included camera view configurations. The \emph{MTPL} value was set to 10 to increase the number of generated nodes and improve the accuracy of measurements of traversal efficiency.
 
-The obtained results are unclear. In \emph{A10} and \emph{forest} scenes all techniques produce a slowdown. Another odd behaviour occurs in \emph{city} and \emph{conference} scenes, where each technique separately results in a speedup, but when combined together they cause a slowdown. The reason for this might be either inaccurate measurements, or suboptimal implementation. After setting \emph{MTPL} to 10, the culling time is mostly in order of hundreds of microseconds, falling to tens for the \emph{A10} scene where only few nodes are visited (which is likely the cause of inaccuracy on this scene).
+The obtained results are unclear. In \emph{A10} and \emph{forest} scenes all techniques produce a slowdown. Another odd behaviour occurs in \emph{city} and \emph{conference} scenes, where each technique separately results in a speedup, but when combined together they cause a slowdown. The reason for this might be either inaccurate measurements, or suboptimal implementation. After setting \emph{MTPL} to 10, the culling time is mostly in order of hundreds of microseconds, falling to tens for the \emph{A10} scene where only few nodes are visited (which is likely the cause of inaccuracy on this scene). Figure \ref{GRAPH:dragon_route} shows another comparison of the same techniques during a flythrough in the \emph{asian dragon} scene. 
 
 \begin{table*}[t]
 \begin{center}
 \begin{tabular}{| r || r | r | r | r | r | r | r |}
 	\hline
-	Scene                                   & A10 & Asian dragon & city2 & city & conference & forest & teapots \\
+	Scene                                   & A10 & asian dragon & city2 & city & conference & forest & teapots \\
 	\#\,tris.                               & 219\,k & 7220\,k & 75\,k & 68\,k & 283\,k & 174\,k & 201\,k \\
 	\#\,nodes                               & 68\,k & 2007\,k & 23\,k & 20\,k & 82\,k & 52\,k & 61\,k \\
 	\#\,trav. nodes                         & 53  & 3721 & 1119 & 367 & 1363  & 573 & 1107 \\
@@ -197,28 +197,6 @@ The obtained results are unclear. In \emph{A10} and \emph{forest} scenes all tec
 \end{center}
 	\caption{Vief frustum culling speedups for individual and all optimization techniques (compared against no optimization) at selected views. \emph{MTPL} was set to 10.}
 	\label{TAB:optim}
-\end{table*}
-
-Table \ref{TAB:configuration} contains the software and hardware configuration that was used for the measurments. The implementation uses a single thread, 
-
-\begin{table*}[t]
-\begin{center}
-\begin{tabular}{| r || l |}
-\hline
-	CPU & Intel Xeon E3-1231 v3 @ 3.4\,GHz, 8\,MB cache, 4 cores, 8 threads \\
-	RAM & 16\,GB \\
-	GPU & Nvidia GeForce GTX 1070 Ti \\
-\hline
-\hline
-	Operating system & MS Windows 10 \\
-	Compiler & MSVC 2017\\
-	Architecture & amd64 \\
-	Compiler options & O2 (maximize speed), inline function expansion, enable intrinsic func. \\
-\hline
-\end{tabular}
-\end{center}
-	\caption{Hardware and software configuration used for measurements.}
-	\label{TAB:configuration}
 \end{table*}
 
 \begin{figure}[H]
@@ -267,24 +245,40 @@ Table \ref{TAB:configuration} contains the software and hardware configuration t
 \end{axis}
 
 \end{tikzpicture}
-	\caption{Comparison of culling optimizations effectivity during camera flythrough in \emph{Asian dragon} scene.}
+	\caption{Comparison of culling optimizations effectivity during camera flythrough in \emph{asian dragon} scene. \emph{MTPL} was set to 100.}
 \label{GRAPH:dragon_route}
 \end{figure}
+
+Table \ref{TAB:configuration} contains the software and hardware configuration that was used for the measurments. The implementation uses a single thread, 
+
+\begin{table*}[t]
+\begin{center}
+\begin{tabular}{| r || l |}
+\hline
+	CPU & Intel Xeon E3-1231 v3 @ 3.4\,GHz, 8\,MB cache, 4 cores, 8 threads \\
+	RAM & 16\,GB \\
+	GPU & Nvidia GeForce GTX 1070 Ti \\
+\hline
+\hline
+	Operating system & MS Windows 10 \\
+	Compiler & MSVC 2017\\
+	Architecture & amd64 \\
+	Compiler options & O2 (maximize speed), inline function expansion, enable intrinsic func. \\
+\hline
+\end{tabular}
+\end{center}
+	\caption{Hardware and software configuration used for measurements.}
+	\label{TAB:configuration}
+\end{table*}
 
 %%%% -------------------------------------------------------- 
 %\section{\label{SEC:Conclusion}Závěr}
 \section{\label{SEC:Conclusion}Conclusion}
-
-V této části uvedete závěr, doporučení pro opakování implementace této
-semestrální práce, omezení implementace či co se nepodařilo.
+A frustum culling algorithm has been implemented, including a simple method for BVH construction. It might be useful to compare the efficiency with an existing implementation. Three optimization techniques for frustum culling were described and evaluated: \emph{plane masking}, \emph{plane coherency}, \emph{octant test}. From the measured results it seems that only \emph{plane masking} offers some improvements, which is the exact opposite than what Assarsson and Möller \cite{TODO} found almost 20 years ago. It is possible that the implementatin of the other two techniques could be improved. The measured results on the \emph{forest} scene should be further investigated. 
 
 %%%% -------------------------------------------------------- 
 %\section*{\label{SEC:ACK}Poděkování}
-\section*{\label{SEC:ACK}Acknowledgment}
-
-Práce je samostatná, ale pokud chcete někomu poděkovat například za
-to, že Vás poslouchal při předběžné prezentaci či za přečtení a
-kontrolu této zprávy a nalezení některých chyb, tak to tady uveďte.
+%\section*{\label{SEC:ACK}Acknowledgment}
 
 %******************************************************************
 % Tady nasleduje seznam literatury a to bud s pouzitim
