@@ -24,7 +24,7 @@ Object::Object(const std::string& fileName):
 		throw std::string("Failed to read the object from .obj file: ")+fileName+std::string("\n");
 
 	if(objData.normalCount <= 0)
-		std::cerr << "The model " << fileName << " does not contain normals.\n";
+		std::cerr << "The model " << fileName << " does not contain normals - they will be calculated.\n";
 
 	_vertexCount = objData.vertexCount;
 	std::vector<Vertex> vertices(_vertexCount);
@@ -41,11 +41,10 @@ Object::Object(const std::string& fileName):
 		primitivesInfo[i].indices[0] = face.vertex_index[0];
 		primitivesInfo[i].indices[1] = face.vertex_index[1];
 		primitivesInfo[i].indices[2] = face.vertex_index[2];
-		primitivesInfo[i].centroid = (
-				vertices[face.vertex_index[0]].position +
-				vertices[face.vertex_index[1]].position +
-				vertices[face.vertex_index[2]].position
-				)/3.f;
+		glm::vec3 &v1 = vertices[face.vertex_index[0]].position,
+			&v2 = vertices[face.vertex_index[1]].position,
+			&v3 = vertices[face.vertex_index[2]].position;
+		primitivesInfo[i].centroid = (v1 + v2 + v3)/3.f;
 		if(objData.normalCount > 0) {
 			const obj_vector& n0 = *objData.normalList[face.normal_index[0]];
 			const obj_vector& n1 = *objData.normalList[face.normal_index[1]];
@@ -54,12 +53,17 @@ Object::Object(const std::string& fileName):
 			vertices[face.vertex_index[1]].normal += glm::vec3(n1.e[0], n1.e[1], n1.e[2]);
 			vertices[face.vertex_index[2]].normal += glm::vec3(n2.e[0], n2.e[1], n2.e[2]);
 		}
+		else {
+			glm::vec3 faceNormal = glm::cross(v1-v3,v1-v2);
+			faceNormal = glm::normalize(faceNormal);
+			vertices[face.vertex_index[0]].normal += faceNormal;
+			vertices[face.vertex_index[1]].normal += faceNormal;
+			vertices[face.vertex_index[2]].normal += faceNormal;
+		}
 	}
 	_triangleCount = objData.faceCount;
-	if(objData.normalCount > 0) {
-		for(Vertex& v : vertices) {
-			v.normal = glm::normalize(v.normal);
-		}
+	for(Vertex& v : vertices) {
+		v.normal = glm::normalize(v.normal);
 	}
 
 	std::vector<unsigned> primitiveOrder = _bvh.build(vertices, primitivesInfo, MAX_PRIMITIVES_IN_LEAF);

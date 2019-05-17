@@ -21,6 +21,9 @@ vec3 lightColor = vec3(1,1,1);
 
 void main() {
 	vec3 L = normalize(CameraPos - worldPosition.xyz);
-	float di = Mat.diffuseK*clamp(dot(L,normal), 0,1);
+	float d = dot(L,normal);
+	// the light is at camera position so it is always shining at the visible side of the face
+	d *= sign(d);
+	float di = Mat.diffuseK*d;
 	fColor = vec4(clamp(di*lightColor, 0,1), 1);
 }
