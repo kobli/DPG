@@ -16,6 +16,7 @@ FontRenderer::FontRenderer(std::string fontFileName, GLuint screenWidth, GLuint 
 
 void FontRenderer::RenderText(std::string text, GLfloat initX, GLfloat initY, GLfloat scale, glm::vec3 color)
 {
+	glDisable(GL_DEPTH_TEST);
 	GLfloat x = initX,
 					y = initY;
 	// Activate corresponding render state	

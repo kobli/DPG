@@ -35,6 +35,7 @@ void Scene::render() {
 	}
 	else
 		glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 	// draw objects
 	for(Object& o : _objects) {
 		glm::mat4 modelInverse = glm::inverse(o.getTransform());
