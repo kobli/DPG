@@ -176,15 +176,26 @@ void Object::draw(const std::vector<Plane>& frustumPlanes, const glm::vec3& frus
 }
 
 void Object::doDrawing(const std::vector<Plane>& frustumPlanes, const glm::vec3& frustumCenter, const glm::vec3& lookDir, const glm::vec3& up) {
-	if(_prevFrustumCenter != frustumCenter || !CAMERA_COHERENCY_ENABLED) {
-		auto start = std::chrono::steady_clock::now();
-		_visibleNodes = _bvh.nodesInFrustum(frustumPlanes, frustumCenter, lookDir, up);
-		FC_TRAVERSE_TIME += std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-start).count()/1000.f;
-		_prevFrustumCenter = frustumCenter;
+	const std::vector<unsigned> *visibleNodes = &_visibleNodes;
+	auto start = std::chrono::steady_clock::now();
+	if(FRUSTUM_CULLING_ENABLED) {
+		if(CAMERA_COHERENCY_ENABLED) {
+			if(_prevFrustumCenter == frustumCenter)
+				;
+			else {
+				_visibleNodes = _bvh.nodesInFrustum(frustumPlanes, frustumCenter, lookDir, up);
+				_prevFrustumCenter = frustumCenter;
+			}
+		}
+		else
+			visibleNodes = &_bvh.nodesInFrustum(frustumPlanes, frustumCenter, lookDir, up);
 	}
+	else
+		_visibleNodes = {0};
+	FC_TRAVERSE_TIME += std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-start).count()/1000.f;
 	const std::vector<NodePrimitives>& nodePrimitives = _bvh.getNodePrimitiveRanges();
 	_renderedTriangleCount = 0;
-	for(const unsigned& nID: _visibleNodes) {
+	for(const unsigned& nID: *visibleNodes) {
 		glDrawElements(GL_TRIANGLES, nodePrimitives[nID].count*3, GL_UNSIGNED_INT, BUFFER_OFFSET(sizeof(unsigned)*3*nodePrimitives[nID].first));
 		_renderedTriangleCount += nodePrimitives[nID].count;
 	}

@@ -60,6 +60,7 @@ Statistics export
 
 Frustum culling options
 -c max_primitives_in_leaf_count
+-no-frustum-culling
 -no-octant-test
 -no-plane-masking
 -no-plane-coherency
@@ -74,6 +75,7 @@ p ... toggle camera playback pause
 + ... increase camera speed (*2)
 - ... decrease camera speed (/2)
 
+f ... toggle frustum culling
 o ... toggle octant test
 m ... toggle plane masking
 l ... toggle plane coherency

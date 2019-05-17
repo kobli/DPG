@@ -156,6 +156,8 @@ void Application::processArgs(int argc, char* argv[]) {
 		if(!_statsOutFile)
 			cerr << "Failed to open stats output file " << argMap["m"] << endl;
 	}
+	if(argMap.count("no-frustum-culling"))
+		FRUSTUM_CULLING_ENABLED = false;
 	if(argMap.count("no-octant-test"))
 		OCTANT_TEST_ENABLED = false;
 	if(argMap.count("no-plane-masking"))
@@ -237,6 +239,9 @@ void Application::onKeyPressed(unsigned char key) {
 			break;
 		case '-':
 			_cameraSpeed /= 2;
+			break;
+		case 'f':
+			FRUSTUM_CULLING_ENABLED = !FRUSTUM_CULLING_ENABLED;
 			break;
 		case 'o':
 			OCTANT_TEST_ENABLED = !OCTANT_TEST_ENABLED;
