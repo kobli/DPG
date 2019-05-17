@@ -162,9 +162,10 @@ obj_light_disc* obj_parse_light_disc(obj_growable_scene_data *scene)
 obj_vector* obj_parse_vector()
 {
 	obj_vector *v = (obj_vector*)malloc(sizeof(obj_vector));
-	v->e[0] = atof( strtok(NULL, WHITESPACE));
-	v->e[1] = atof( strtok(NULL, WHITESPACE));
-	v->e[2] = atof( strtok(NULL, WHITESPACE));
+	char* c;
+	if((c = strtok(NULL, WHITESPACE))) v->e[0] = atof(c);
+	if((c = strtok(NULL, WHITESPACE))) v->e[1] = atof(c);
+	if((c = strtok(NULL, WHITESPACE))) v->e[2] = atof(c);
 	return v;
 }
 
