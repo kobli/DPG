@@ -1,10 +1,9 @@
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 #include "camera.hpp"
 #include "utils.hpp"
+#include "libs.hpp"
 
 const float CAM_NEAR = 1.0f;
-const float CAM_FAR = 100000.0f;
+const float CAM_FAR = 10000000.0f;
 
 Camera::Camera():
 	_lookDir{glm::vec3(1,0,0)},

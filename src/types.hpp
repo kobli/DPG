@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <limits>
-#include "main.hpp"
+#include "libs.hpp"
 
 struct Color {
 	float r;

@@ -6,7 +6,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "main.hpp"
+#include "libs.hpp"
 #include "types.hpp"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))

@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
 project(FrustumCulling)
 
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 find_library(FREETYPE_LIB freetype HINTS ${PROJECT_BINARY_DIR})
 find_package(OpenGL REQUIRED)

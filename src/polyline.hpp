@@ -3,8 +3,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include "libs.hpp"
 #include "utils.hpp"
 
 struct PolyLineNode {

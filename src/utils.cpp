@@ -3,9 +3,7 @@
 #include <fstream>
 #include <cstddef>
 #include <cassert>
-#include <GL/glew.h>
-#include <glm/gtc/random.hpp>
-#include <glm/gtx/rotate_vector.hpp>
+#include "libs.hpp"
 #include "utils.hpp"
 using namespace std;
 
