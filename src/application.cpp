@@ -72,10 +72,12 @@ Application::Application(int argc, char* argv[]):
 }
 
 Application::~Application() {
-	if (_cameraRoute.save(_cameraRouteOutFileName))
-		std::cout << "Camera route saved.\n";
-	else
-		std::cerr << "Failed to save camera route.\n";
+	if(!_cameraRouteOutFileName.empty()) {
+		if(_cameraRoute.save(_cameraRouteOutFileName))
+			std::cout << "Camera route saved.\n";
+		else
+			std::cerr << "Failed to save camera route.\n";
+	}
 }
 
 void Application::processArgs(int argc, char* argv[]) {
