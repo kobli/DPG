@@ -2,7 +2,7 @@
 #include "utils.hpp"
 #include "libs.hpp"
 
-const float CAM_NEAR = 1.0f;
+const float CAM_NEAR = 10.0f;
 const float CAM_FAR = 10000000.0f;
 
 Camera::Camera():

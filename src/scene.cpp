@@ -28,6 +28,9 @@ void Scene::render() {
 	float f = _camera.getFar();
 	glm::vec3 frustumCenterWorld = _camera.getPosition() + _camera.getLookDir()*(n + (f-n)/2);
 
+	glDisable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 	// draw objects
 	for(Object& o : _objects) {
 		glm::mat4 modelInverse = glm::inverse(o.getTransform());
