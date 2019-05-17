@@ -1,3 +1,4 @@
+/** @file */
 #ifndef TYPES_HPP_18_12_30_14_55_14
 #define TYPES_HPP_18_12_30_14_55_14 
 
@@ -29,6 +30,8 @@ struct AABB {
 	glm::vec3 min = glm::vec3(std::numeric_limits<float>::max());
 	glm::vec3 max = glm::vec3(std::numeric_limits<float>::lowest());
 
+	/** Enlarges this AABB if necessary to contain the given point
+	 */
 	AABB& unite(const glm::vec3& p) {
 		min = glm::min(min, p);
 		max = glm::max(max, p);
@@ -39,7 +42,8 @@ struct AABB {
 		return (min+max)/2.f;
 	}
 
-	// lower case = min, upper case = max
+	/** lower case = min, upper case = max
+	 */
 	enum VertexIndex {
 		xyz,
 		xyZ,
@@ -71,7 +75,9 @@ inline void normalizePlane(Plane& p) {
 	p /= l;
 }
 
-// normal must already be normalized
+/** Calculates a plane from normal and one contained point.
+ * The normal must already be normalized
+ */
 inline Plane planeFromNormalAndPoint(const glm::vec3& normal, const glm::vec3& point) {
 	return glm::vec4(normal, -glm::dot(normal, point));
 }

@@ -16,8 +16,8 @@ std::istream& operator>>(std::istream& s, glm::vec3& v);
 
 void setUniform(GLuint program, const glm::mat4x4& m, std::string name);
 
-bool loadObj(std::string fileName, std::vector<Vertex>& vertices_out);
-
+/** Creates and links shader program from pairs shaderType-fileName.
+ */
 GLuint loadShaderProgram(std::vector<std::tuple<GLenum,std::string>> shaderFiles);
 
 void openglCallbackFunction(GLenum source,

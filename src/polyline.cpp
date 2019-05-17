@@ -11,7 +11,6 @@ PolyLineNode PolyLineNode::interpolate(const PolyLineNode& n2, float tg) {
 	return n;
 }
 
-// returns direct distance from a node (not along the line)
 float PolyLineNode::distanceFrom(const PolyLineNode& n) {
 	return glm::distance(position, n.position);
 }

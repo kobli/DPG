@@ -7,8 +7,16 @@ class Camera {
 		Camera();
 		void setPosition(const glm::vec3& pos);
 		void setLookDir(const glm::vec3& dir);
+
+		/** Adds the delta to the position.
+		 */
 		void move(glm::vec3 delta);
+
+		/** Rotates the camera around Y axis.
+		 * setUpVector has no effect on the axis of rotation.
+		 */
 		void rotateHoriz(float delta);
+
 		glm::mat4 getViewProjection() const;
 		glm::vec3 getPosition() const;
 		glm::vec3 getLookDir() const;
@@ -16,6 +24,9 @@ class Camera {
 		float getFar() const;
 		void setUpVector(const glm::vec3& up);
 		glm::vec3 getUpVector() const;
+
+		/** Sets the horizontal and vertical field of view in radians.
+		 */
 		void setFOV(float fov);
 
 	private:
