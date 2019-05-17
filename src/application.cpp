@@ -294,7 +294,7 @@ void Application::onKeyPressed(unsigned char key) {
 }
 
 void Application::logFrameStats() {
-	if(_statsOutFile) {
+	if(_statsOutFile.is_open()) {
 		_statsOutFile << _cameraPlayLineNode.t << " " 
 		 << _frameTime << " "
 		 << _scene->totalObjectGPUDrawTime() << " "
