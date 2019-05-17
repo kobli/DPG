@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "obj_parser.h"
 #include "list.h"
 #include "string_extra.h"
@@ -58,6 +59,8 @@ int obj_parse_vertex_index(int *vertex_index, int *texture_index, int *normal_in
 	
 	while( (token = strtok(NULL, WHITESPACE)) != NULL)
 	{
+		assert(vertex_count < MAX_VERTEX_COUNT);
+
 		if(texture_index != NULL)
 			texture_index[vertex_count] = 0;
 		if(normal_index != NULL)

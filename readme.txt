@@ -39,6 +39,7 @@ To do so, it was necessary to create an application, which can load .obj scenes 
 
 ============================================================
 3) application command line arguments
+Note that only triangle-only scenes are supported!
 
 -s sceneName (required)
 
