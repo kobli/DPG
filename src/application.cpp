@@ -240,6 +240,9 @@ void Application::onKeyPressed(unsigned char key) {
 		case '-':
 			_cameraSpeed /= 2;
 			break;
+		case 'b':
+			BF_CULLING_ENABLED = !BF_CULLING_ENABLED;
+			break;
 		case 'f':
 			FRUSTUM_CULLING_ENABLED = !FRUSTUM_CULLING_ENABLED;
 			break;

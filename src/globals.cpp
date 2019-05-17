@@ -1,5 +1,6 @@
 unsigned MAX_PRIMITIVES_IN_LEAF = 10000;
 
+bool BF_CULLING_ENABLED       = false;
 bool FRUSTUM_CULLING_ENABLED  = true;
 bool OCTANT_TEST_ENABLED      = true;
 bool PLANE_MASKING_ENABLED    = true;

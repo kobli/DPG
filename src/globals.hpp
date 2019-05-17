@@ -3,6 +3,7 @@
 
 extern unsigned MAX_PRIMITIVES_IN_LEAF;
 
+extern bool BF_CULLING_ENABLED;
 extern bool FRUSTUM_CULLING_ENABLED;
 extern bool OCTANT_TEST_ENABLED;
 extern bool PLANE_MASKING_ENABLED;

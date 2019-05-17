@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_access.hpp>
 #include "scene.hpp"
 #include "utils.hpp"
+#include "globals.hpp"
 
 Scene::Scene() {
 	// load and prepare shaders
@@ -28,9 +29,12 @@ void Scene::render() {
 	float f = _camera.getFar();
 	glm::vec3 frustumCenterWorld = _camera.getPosition() + _camera.getLookDir()*(n + (f-n)/2);
 
-	glDisable(GL_CULL_FACE);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
+	if(BF_CULLING_ENABLED) {
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+	}
+	else
+		glDisable(GL_CULL_FACE);
 	// draw objects
 	for(Object& o : _objects) {
 		glm::mat4 modelInverse = glm::inverse(o.getTransform());
