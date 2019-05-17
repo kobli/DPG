@@ -3,12 +3,14 @@
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <chrono>
 #include "libs.hpp"
 #include "utils.hpp"
 #include "application.hpp"
 #include "camera.hpp"
 #include "object.hpp"
 #include "globals.hpp"
+#include "circularBuffer.hpp"
 
 static const float CAMERA_PLAY_SPEED = 100;
 
@@ -170,15 +172,43 @@ void Application::processArgs(int argc, char* argv[]) {
 
 void Application::displayStats() {
 	using namespace std;
+	const unsigned circSize = 5;
+	static CircularBuffer<float> drawTimeCirc(circSize);
+	static CircularBuffer<float> travTimeCirc(circSize);
+	static CircularBuffer<float> frameTimeCirc(circSize);
+	static auto lastUpdate = chrono::steady_clock::now();
+
+	if(chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now()-lastUpdate).count() > 200) {
+		lastUpdate = chrono::steady_clock::now();
+		drawTimeCirc.add(_scene->totalObjectGPUDrawTime());
+		travTimeCirc.add(FC_TRAVERSE_TIME);
+		frameTimeCirc.add(_frameTime);
+	}
+
 	stringstream ss;
-	ss << "FPS: " << int(1/_frameTime) << endl;
-	ss << "Draw time [ms]: " << _scene->totalObjectGPUDrawTime() << endl;
+	ss.precision(3);
+	ss << "FPS: " << int(1/frameTimeCirc.avg()) << endl;
+	ss << "Draw time [ms]: " << drawTimeCirc.avg() << endl;
 	ss << "Triangles rendered / total: " << _scene->totalObjectTrianglesRendered() << " / " << _scene->triangleCount() << endl;
-	ss << "Culling time [ms]: " << FC_TRAVERSE_TIME << endl;
+	ss << "Culling time [ms]: " << travTimeCirc.avg() << endl;
 	ss << "Visited node count / total: " << FC_NODE_VISITED_COUNT << " / " << FC_NODE_COUNT << endl;
 	ss << "Tree depth: " << FC_TREE_DEPTH << endl;
 	ss << "Max tris per leaf: " << MAX_PRIMITIVES_IN_LEAF << endl;
-	ss << "VFC optimizations (octant t., plane masking, plane coh., cam. coh.): " << OCTANT_TEST_ENABLED << " " << PLANE_MASKING_ENABLED << " " << PLANE_COHERENCY_ENABLED << " " << CAMERA_COHERENCY_ENABLED << endl;
+	ss << "Backface culling: " << BF_CULLING_ENABLED << endl;
+	ss << "VF culling: " << FRUSTUM_CULLING_ENABLED;
+	if(FRUSTUM_CULLING_ENABLED) {
+		ss << "(";
+		if(OCTANT_TEST_ENABLED)
+			ss << " + octant t.";
+		if(PLANE_MASKING_ENABLED)
+			ss << " + plane masking";
+		if(PLANE_COHERENCY_ENABLED)
+			ss << " + plane coh.";
+		if(CAMERA_COHERENCY_ENABLED)
+			ss << " + camera coh.";
+		ss << ")";
+	}
+	ss << endl;
 	_fr->RenderText(ss.str(), 10, 150, 0.4, {1,0,0});
 }
 
