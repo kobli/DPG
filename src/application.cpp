@@ -327,7 +327,7 @@ void Application::idle() {
 	instance().logFrameStats();
 	if(instance()._quitAfterPlayback && instance()._cameraPlayLineNode.t == 1)
 		exit(0);
-	if(instance()._quitAfterPlayback && instance()._runningTime >= 1)
+	if(instance()._quitAfterPlayback && instance()._runningTime >= 1 && instance()._cameraPlayLineNode.t == 0)
 		exit(0);
 	instance().moveCamera();
 	glutPostRedisplay();
