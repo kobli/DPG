@@ -36,7 +36,13 @@ Application::Application(int argc, char* argv[]):
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitContextVersion (4, 5);
+#ifdef DEBUG
+	cout << "Debug build\n";
 	glutInitContextFlags (GLUT_CORE_PROFILE | GLUT_DEBUG);
+#else
+	cout << "Release build\n";
+	glutInitContextFlags (GLUT_CORE_PROFILE);
+#endif
 	glutInitWindowSize(1024,1024);
 	glutCreateWindow(argv[0]);
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
@@ -45,6 +51,7 @@ Application::Application(int argc, char* argv[]):
 		cerr << "Cannot initialize GLEW\n";
 		exit(EXIT_FAILURE);
 	}
+#ifdef DEBUG
 	if(glDebugMessageCallback){
 		cout << "Register OpenGL debug callback " << endl;
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -59,6 +66,7 @@ Application::Application(int argc, char* argv[]):
 	}
 	else
 		cout << "glDebugMessageCallback not available" << endl;
+#endif
 
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 	glutKeyboardFunc(Application::keyDown);
