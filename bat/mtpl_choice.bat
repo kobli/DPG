@@ -1,0 +1,6 @@
+Release\FrustumCulling.exe -p ../stats/part_of_pompeii.01.final.combined.camroute -s scenes/part_of_pompeii.01.final.combined.obj -q -u 0.001 -m ../stats/part_of_pompeii.01.final.combined_100.stats -c 100
+Release\FrustumCulling.exe -p ../stats/part_of_pompeii.01.final.combined.camroute -s scenes/part_of_pompeii.01.final.combined.obj -q -u 0.001 -m ../stats/part_of_pompeii.01.final.combined_1000.stats -c 1000
+Release\FrustumCulling.exe -p ../stats/part_of_pompeii.01.final.combined.camroute -s scenes/part_of_pompeii.01.final.combined.obj -q -u 0.001 -m ../stats/part_of_pompeii.01.final.combined_10000.stats -c 10000
+Release\FrustumCulling.exe -p ../stats/part_of_pompeii.01.final.combined.camroute -s scenes/part_of_pompeii.01.final.combined.obj -q -u 0.001 -m ../stats/part_of_pompeii.01.final.combined_100000.stats -c 100000
+Release\FrustumCulling.exe -p ../stats/part_of_pompeii.01.final.combined.camroute -s scenes/part_of_pompeii.01.final.combined.obj -q -u 0.001 -m ../stats/part_of_pompeii.01.final.combined_1000000.stats -c 1000000
+Release\FrustumCulling.exe -p ../stats/part_of_pompeii.01.final.combined.camroute -s scenes/part_of_pompeii.01.final.combined.obj -q -u 0.001 -m ../stats/part_of_pompeii.01.final.combined_10000000.stats -c 10000000
