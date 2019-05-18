@@ -1,5 +1,0 @@
-Release\FrustumCulling.exe -u 0.02 -q -c 100 -s scenes/asianDragon.obj -p ../stats/asianDragon.camroute -m ../stats/asianDragon_route_100.stats -no-octant-test -no-plane-coherency -no-plane-masking 
-Release\FrustumCulling.exe -u 0.02 -q -c 100 -s scenes/asianDragon.obj -p ../stats/asianDragon.camroute -m ../stats/asianDragon_route_100_o.stats -no-plane-coherency -no-plane-masking 
-Release\FrustumCulling.exe -u 0.02 -q -c 100 -s scenes/asianDragon.obj -p ../stats/asianDragon.camroute -m ../stats/asianDragon_route_100_l.stats -no-octant-test -no-plane-masking 
-Release\FrustumCulling.exe -u 0.02 -q -c 100 -s scenes/asianDragon.obj -p ../stats/asianDragon.camroute -m ../stats/asianDragon_route_100_m.stats -no-octant-test -no-plane-coherency
-Release\FrustumCulling.exe -u 0.02 -q -c 100 -s scenes/asianDragon.obj -p ../stats/asianDragon.camroute -m ../stats/asianDragon_route_100_olm.stats
