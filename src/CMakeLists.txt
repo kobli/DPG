@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
 project(FrustumCulling)
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+if(CMAKE_COMPILER_IS_GNUCXX)
+    message(STATUS "GCC detected, adding warning flags")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -18,7 +22,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/freetype
 	${PROJECT_SOURCE_DIR}/freetype/config
     ${OPENGL_INCLUDE_DIRS} 
-    ${GLUT_INCLUDE_DIRS}
+    ${GLUT_INCLUDE_DIR}
     ${GLEW_INCLUDE_DIRS}
     ${GLM_INCLUDE_DIRS}
 	)
