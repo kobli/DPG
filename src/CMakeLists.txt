@@ -1,13 +1,18 @@
 cmake_minimum_required(VERSION 3.2)
 project(FrustumCulling)
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-    message(STATUS "GCC detected, adding warning flags")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # using GCC
+    message(STATUS "GCC detected, adding compiler flags")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
-endif(CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    # using Visual Studio C++
+    message(STATUS "MSVC detected, adding compiler flags")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /Oi /Ot")
+endif()
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 find_library(FREETYPE_LIB freetype HINTS ${PROJECT_BINARY_DIR})
 find_package(OpenGL REQUIRED)
