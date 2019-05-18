@@ -137,31 +137,77 @@ First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be c
 \begin{axis}[
 		width=0.6\textwidth,
     enlargelimits=false,
-		only marks,
-		xlabel={Draw time $[ms]$},
-		ylabel={BVH traverse time $[ms]$},
-		ymax = 0.3,
-		xmin = 0.1,
-		xmax = 3,
-		yticklabel style={/pgf/number format/fixed}
+		no markers,
+		%only marks,
+		ylabel={Frame time $[ms]$},
+		xlabel={Camera view interpolation parameter},
+		cycle list={red,blue,brown,teal,orange,violet,cyan,green!70!black,magenta,gray},
+		ymax = 10,
+		%xmin = 0.2,
+		yticklabel style={/pgf/number format/fixed},
+		%thick,
+		%each nth point={50},	
 ]
-\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_100.stats};
+\addplot+[] table [x index=0, y expr={(\thisrowno{2} + \thisrowno{7})}]{../stats/part_of_pompeii.01.final.combined_100.stats};
 \addlegendentry{$10^{2}$}
 
-\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_1000.stats};
+\addplot+[] table [x index=0, y expr={(\thisrowno{2} + \thisrowno{7})}]{../stats/part_of_pompeii.01.final.combined_1000.stats};
 \addlegendentry{$10^{3}$}
 
-\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_10000.stats};
+\addplot+[] table [x index=0, y expr={(\thisrowno{2} + \thisrowno{7})}]{../stats/part_of_pompeii.01.final.combined_10000.stats};
 \addlegendentry{$10^{4}$}
 
-\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_100000.stats};
+\addplot+[] table [x index=0, y expr={(\thisrowno{2} + \thisrowno{7})}]{../stats/part_of_pompeii.01.final.combined_100000.stats};
 \addlegendentry{$10^{5}$}
 
-\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_1000000.stats};
+\addplot+[] table [x index=0, y expr={(\thisrowno{2} + \thisrowno{7})}]{../stats/part_of_pompeii.01.final.combined_1000000.stats};
 \addlegendentry{$10^{6}$}
 
-\addplot+[] table [x index=2,y index=7]{../stats/asianDragon_10000000.stats};
+\addplot+[] table [x index=0, y expr={(\thisrowno{2} + \thisrowno{7})}]{../stats/part_of_pompeii.01.final.combined_10000000.stats};
 \addlegendentry{$10^{7}$}
+
+\end{axis}
+\end{tikzpicture}
+\caption{Scene draw time and BVH traverse time based on chosen \emph{MTPL} value. The samples for each \emph{MTPL} value were obtained using the same set of camera views in the asian dragon scene.}
+\label{GRAPH:mtpl}
+\end{center}
+\end{figure}
+
+
+
+
+
+\begin{figure}[H]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+		width=0.6\textwidth,
+    enlargelimits=false,
+		no markers,
+		%only marks,
+		ylabel={Frame time $[ms]$},
+		xlabel={Camera view interpolation parameter},
+		cycle list={red,blue,brown,teal,orange,violet,cyan,green!70!black,magenta,gray},
+		%xmin = 0.2,
+		yticklabel style={/pgf/number format/fixed},
+		%thick,
+		%each nth point={10},
+		%smooth,
+]
+\addplot+[thick] table [x index=0, y index=7]{../stats/part_of_pompeii.01.final.combined_100_c.stats};
+\addlegendentry{none}
+
+\addplot+[] table [x index=0, y index=7]{../stats/part_of_pompeii.01.final.combined_100_cl.stats};
+\addlegendentry{plane coh.}
+
+\addplot+[] table [x index=0, y index=7]{../stats/part_of_pompeii.01.final.combined_100_cm.stats};
+\addlegendentry{plane mask.}
+
+\addplot+[] table [x index=0, y index=7]{../stats/part_of_pompeii.01.final.combined_100_co.stats};
+\addlegendentry{octant t.}
+
+\addplot+[thick,dotted] table [x index=0, y index=7]{../stats/part_of_pompeii.01.final.combined_100_colm.stats};
+\addlegendentry{all}
 
 \end{axis}
 \end{tikzpicture}
@@ -199,55 +245,55 @@ The obtained results are unclear. In \emph{A10} and \emph{forest} scenes all tec
 	\label{TAB:optim}
 \end{table*}
 
-\begin{figure}[H]
-	\begin{tikzpicture}[]
-\pgfplotsset{set layers}
-\begin{axis}[
-		width=0.8\textwidth,
-		scale only axis,
-		axis y line*=left,
-		legend pos=north west,
-		no markers,
-		xlabel={Route interpolation parameter (camera position and direction)},
-		ylabel={BVH traverse time $[ms]$},
-		xmin = 0,
-		xmax = 1,
-]
-\addplot+[black,dashed] table [x index=0,y index=7]{../stats/asianDragon_route_100.stats};
-\addlegendentry{No optimizations}
-
-\addplot+[red] table [x index=0,y index=7]{../stats/asianDragon_route_100_l.stats};
-\addlegendentry{Plane coherency}
-
-\addplot+[green] table [x index=0,y index=7]{../stats/asianDragon_route_100_m.stats};
-\addlegendentry{Plane masking}
-
-\addplot+[blue] table [x index=0,y index=7]{../stats/asianDragon_route_100_o.stats};
-\addlegendentry{Octant test}
-
-\addplot+[black] table [x index=0,y index=7]{../stats/asianDragon_route_100_olm.stats};
-\addlegendentry{All optimizations}
-\end{axis}
-
-\begin{axis}[
-		width=0.8\textwidth,
-		scale only axis,
-		axis y line*=right,
-		ylabel near ticks,
-		yticklabel pos=right,
-		axis x line=none,
-		no markers,
-		ylabel={\#\,trav. nodes},
-		xmin = 0,
-		xmax = 1,
-]
-\addplot+[opacity=0,fill=black,fill opacity=0.1] table [x index=0,y index=5]{../stats/asianDragon_route_100.stats};
-\end{axis}
-
-\end{tikzpicture}
-	\caption{Comparison of culling optimizations effectivity during camera flythrough in \emph{asian dragon} scene. \emph{MTPL} was set to 100.}
-\label{GRAPH:dragon_route}
-\end{figure}
+%\begin{figure}[H]
+%	\begin{tikzpicture}[]
+%\pgfplotsset{set layers}
+%\begin{axis}[
+%		width=0.8\textwidth,
+%		scale only axis,
+%		axis y line*=left,
+%		legend pos=north west,
+%		no markers,
+%		xlabel={Route interpolation parameter (camera position and direction)},
+%		ylabel={BVH traverse time $[ms]$},
+%		xmin = 0,
+%		xmax = 1,
+%]
+%\addplot+[black,dashed] table [x index=0,y index=7]{../stats/asianDragon_route_100.stats};
+%\addlegendentry{No optimizations}
+%
+%\addplot+[red] table [x index=0,y index=7]{../stats/asianDragon_route_100_l.stats};
+%\addlegendentry{Plane coherency}
+%
+%\addplot+[green] table [x index=0,y index=7]{../stats/asianDragon_route_100_m.stats};
+%\addlegendentry{Plane masking}
+%
+%\addplot+[blue] table [x index=0,y index=7]{../stats/asianDragon_route_100_o.stats};
+%\addlegendentry{Octant test}
+%
+%\addplot+[black] table [x index=0,y index=7]{../stats/asianDragon_route_100_olm.stats};
+%\addlegendentry{All optimizations}
+%\end{axis}
+%
+%\begin{axis}[
+%		width=0.8\textwidth,
+%		scale only axis,
+%		axis y line*=right,
+%		ylabel near ticks,
+%		yticklabel pos=right,
+%		axis x line=none,
+%		no markers,
+%		ylabel={\#\,trav. nodes},
+%		xmin = 0,
+%		xmax = 1,
+%]
+%\addplot+[opacity=0,fill=black,fill opacity=0.1] table [x index=0,y index=5]{../stats/asianDragon_route_100.stats};
+%\end{axis}
+%
+%\end{tikzpicture}
+%	\caption{Comparison of culling optimizations effectivity during camera flythrough in \emph{asian dragon} scene. \emph{MTPL} was set to 100.}
+%\label{GRAPH:dragon_route}
+%\end{figure}
 
 Table \ref{TAB:configuration} contains the software and hardware configuration that was used for the measurments. The implementation uses a single thread, 
 
