@@ -3,3 +3,9 @@ for file in `ls | egrep '*_[olm]*.stats'`; do echo "$file `cat "$file" |cut -d '
 
 # print view characteristics
 for file in `ls | egrep '*_.stats'`; do echo "$file `cat "$file" | cut -d ' ' -f5,6,7 |tail -n 1`"; done
+
+# replace each sequence of 20 rows be their average (over their columns)
+for file in ../stats/*.stats; do awk -i inplace 'n<20{for(i=1;i<=NF;i++)a[i]+=$i;n++;} n==20{for(i=1;i<=NF;i++)s=s sprintf("%s ",a[i]/20); print s;s="";delete a;n=0}' "$file"; done
+
+# calculate culling speedups on all scenes along camera route
+for FILE in `ls -1 ../data/scenes/big_scenes/  | sed 's/.\{4\}$//'`; do paste -d ' ' "${FILE}.stats" "${FILE}_10000_com.stats" | awk '{print($1 " " ($3+$8)/($11+$16) " " $12/$13)}' > "${FILE}.speedup"; done
