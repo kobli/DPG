@@ -122,13 +122,38 @@ There are several possible optimizations, as described in \cite{Assarsson}. \emp
 \section{\label{SEC:Pitfalls}Implementation details}
 The most annoying part of the project was getting it to compile on Windows. It took me around three hours to setup the project with all the dependencies and resolve name collisions with Windows constants and macros. Also on Windows some destructors were not called after closing the application window, which was solved by passing an option to GLUT to not terminate after the window is closed but rather only exit the main loop. The most tricky to find programming error was switched function arguments. Worse than that was a false assumption about the \emph{octant test}, that the planes it eliminates from testing can also be masked out from the child nodes. This is not true, because the bounding volume can also intersect those, meaning the children can intersect them as well.
 
-I had a problem with two provided scenes: \emph{sibenik} and \emph{park}. The obj loader crashes while trying to load them, so I would have to either fix it (the code is quite bad -- I should have checked it before trying to use it) or find a different loader.
-
-The total time spent on the project is likely around 80 hours, including this report, but not counting the preparation of presentations. I had some code to start with from a previous project, but it had to be refactored and quite extensively so starting from scratch would likely not add much time.
+The total time spent on the project is likely around 100 hours, including this report, but not counting the preparation of presentations. I had some code to start with from a previous project, but it had to be refactored and quite extensively so starting from scratch would likely not add much time. The evaluation (measurements, processing of the data, creating graphs) took significant portion of the time spent on the project -- my estimate is 15 to 20 hours. I had to repeat it several times, first because I started measuring in debug mode, then because of errors in command line arguments passed to the program and then again because the scenes used were found to be too small.
 
 %%%% -------------------------------------------------------- 
 %\section{\label{SEC:Results}Naměřené výsledky}
 \section{\label{SEC:Results}Results}
+All the measurements are done on the scenes listed in table \ref{TAB:scenes}. For each scene a single prerecorded camera route is used, defining the position and orientation of the camera. The routes start such that the entire scene is visible, continuing through the scene, lowering the amount of visible geometry down to zero, where they end. During measurement, this route is steped through with equally sized steps and the statistics are recorded. Each twenty consequent records are then averaged.
+
+\begin{table*}[t]
+\begin{center}
+\begin{tabular}{| r || r | r | r | r | r | r | r |}
+	\hline
+	Scene                                   & A10 & asian dragon & city2 & city & conference & forest & teapots \\
+	\#\,tris.                               & 219\,k & 7220\,k & 75\,k & 68\,k & 283\,k & 174\,k & 201\,k \\
+	\#\,nodes                               & 68\,k & 2007\,k & 23\,k & 20\,k & 82\,k & 52\,k & 61\,k \\
+	\#\,trav. nodes                         & 53  & 3721 & 1119 & 367 & 1363  & 573 & 1107 \\
+	\diagbox[width=10em]{\\Optimization}{} &&&&&&& \\
+\hline
+\hline
+	Plane masking                           & 0.8 & 2.1 & 1.5 & 1.6 & 3.1 & 0.4 & 0.9 \\
+\hline
+	Plane coherency                         & 0.7 & 0.5 & 1.9 & 0.9 & 1.1 & 0.3 & 1.3 \\
+\hline
+	Octant test                             & 0.7 & 1.6 & 0.8 & 1.2 & 1.6 & 0.3 & 1.5 \\
+\hline
+	All                                     & 1.0 & 1.5 & 1.4 & 0.9 & 1.0 & 0.6 & 1.6 \\
+\hline
+\end{tabular}
+\end{center}
+	\caption{TODO .. scenes}
+	\label{TAB:scenes}
+\end{table*}
+
 First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be chosen. If it is too high, fewer nodes will be created and the culling will be faster, but less accurate and therefore more excess triangles will be sent for rendering, increasing the draw time. Figure \ref{GRAPH:mtpl} demonstrates that. Based on it, the \emph{MTPL} value was chosen to be $10^{4}$.
 
 \begin{figure}[H]
@@ -140,7 +165,7 @@ First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be c
 		no markers,
 		%only marks,
 		ylabel={Frame time $[ms]$},
-		xlabel={Camera view interpolation parameter},
+		xlabel={Camera route interpolation parameter},
 		cycle list={red,blue,brown,teal,orange,violet,cyan,green!70!black,magenta,gray},
 		ymax = 10,
 		%xmin = 0.2,
@@ -168,14 +193,12 @@ First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be c
 
 \end{axis}
 \end{tikzpicture}
-\caption{Scene draw time and BVH traverse time based on chosen \emph{MTPL} value. The samples for each \emph{MTPL} value were obtained using the same set of camera views in the asian dragon scene.}
+	\caption{Frame time over the same camera route for various \emph{MTPL} values, measured in scene 1}
 \label{GRAPH:mtpl}
 \end{center}
 \end{figure}
 
-
-
-
+Next, the culling optimization techniques will be compared. Figure \ref{GRAPH:optimizations} shows comparison of culling time for different versions of the algorithm on the same camera route in scene 1. The \emph{MTPL} value was set to 100 to increase the number of generated nodes and therefore improve the accuracy of measurements of the traversal efficiency. According to the obtained results, the optimal combination of optimization techniques is \emph{plane masking} and \emph{octant test}.
 
 \begin{figure}[H]
 \begin{center}
@@ -184,15 +207,10 @@ First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be c
 		width=0.6\textwidth,
     enlargelimits=false,
 		no markers,
-		%only marks,
-		ylabel={Frame time $[ms]$},
-		xlabel={Camera view interpolation parameter},
+		ylabel={Culling time $[ms]$},
+		xlabel={Camera route interpolation parameter},
 		cycle list={red,blue,brown,teal,orange,violet,cyan,green!70!black,magenta,gray},
-		%xmin = 0.2,
 		yticklabel style={/pgf/number format/fixed},
-		%thick,
-		%each nth point={10},
-		%smooth,
 ]
 \addplot+[thick] table [x index=0, y index=7]{../stats/part_of_pompeii.01.final.combined_100_c.stats};
 \addlegendentry{none}
@@ -211,89 +229,54 @@ First, a suitable maximum number of triangles per leaf (\emph{MTPL}) has to be c
 
 \end{axis}
 \end{tikzpicture}
-\caption{Scene draw time and BVH traverse time based on chosen \emph{MTPL} value. The samples for each \emph{MTPL} value were obtained using the same set of camera views in the asian dragon scene.}
-\label{GRAPH:mtpl}
+	\caption{Comparison of culling optimization techniques -- culling time along camera route in scene 1. Each of the techniques is measured individually and then all of them combined. Culling time without optimizations is also included.}
+\label{GRAPH:optimizations}
 \end{center}
 \end{figure}
 
-Now the culling optimization techniques can be evaluated. Table \ref{TAB:optim} shows speedups of each technique tested separately and all at once against the basic version of the algorithm. The culling time speedups were calculated from averages of circa 60 values, which were measured over one second using included camera view configurations. The \emph{MTPL} value was set to 10 to increase the number of generated nodes and improve the accuracy of measurements of traversal efficiency.
+Now the frustum culling algorithm with optimal parameters will be evaluated on several scenes. The \emph{MTPL} is set to $10^{4}$ and only \emph{octant test} and \emph{plane masking} optimizations are enabled. Figure \ref{GRAPH:speedup} shows the frame time speedup depending on the percentage of visible geometry.
 
-The obtained results are unclear. In \emph{A10} and \emph{forest} scenes all techniques produce a slowdown. Another odd behaviour occurs in \emph{city} and \emph{conference} scenes, where each technique separately results in a speedup, but when combined together they cause a slowdown. The reason for this might be either inaccurate measurements, or suboptimal implementation. After setting \emph{MTPL} to 10, the culling time is mostly in order of hundreds of microseconds, falling to tens for the \emph{A10} scene where only few nodes are visited (which is likely the cause of inaccuracy on this scene). With \emph{MTPL} set to 10000, which was determined to be the value with optimal balance between draw time and traverse time, the traverse time is in the order of lower tens of microsenonds for all of the tested views. Figure \ref{GRAPH:dragon_route} shows another comparison of the same techniques during a flythrough in the \emph{asian dragon} scene. 
-
-\begin{table*}[t]
+\begin{figure}[H]
 \begin{center}
-\begin{tabular}{| r || r | r | r | r | r | r | r |}
-	\hline
-	Scene                                   & A10 & asian dragon & city2 & city & conference & forest & teapots \\
-	\#\,tris.                               & 219\,k & 7220\,k & 75\,k & 68\,k & 283\,k & 174\,k & 201\,k \\
-	\#\,nodes                               & 68\,k & 2007\,k & 23\,k & 20\,k & 82\,k & 52\,k & 61\,k \\
-	\#\,trav. nodes                         & 53  & 3721 & 1119 & 367 & 1363  & 573 & 1107 \\
-	\diagbox[width=10em]{\\Optimization}{} &&&&&&& \\
-\hline
-\hline
-	Plane masking                           & 0.8 & 2.1 & 1.5 & 1.6 & 3.1 & 0.4 & 0.9 \\
-\hline
-	Plane coherency                         & 0.7 & 0.5 & 1.9 & 0.9 & 1.1 & 0.3 & 1.3 \\
-\hline
-	Octant test                             & 0.7 & 1.6 & 0.8 & 1.2 & 1.6 & 0.3 & 1.5 \\
-\hline
-	All                                     & 1.0 & 1.5 & 1.4 & 0.9 & 1.0 & 0.6 & 1.6 \\
-\hline
-\end{tabular}
-\end{center}
-	\caption{Vief frustum culling speedups for individual and all optimization techniques (compared against no optimization) at selected views. \emph{MTPL} was set to 10.}
-	\label{TAB:optim}
-\end{table*}
+\begin{tikzpicture}
+\begin{axis}[
+		width=0.6\textwidth,
+    enlargelimits=false,
+		%no markers,
+		only marks,
+		ylabel={Speedup},
+		xlabel={Camera route interpolation parameter},
+		%cycle list={red,blue,brown,teal,orange,violet,cyan,green!70!black,magenta,gray},
+		yticklabel style={/pgf/number format/fixed},
+		ymode=log,
+]
+\addplot+[] table [x index=2, y index=1]{../stats/part_of_pompeii.01.final.combined.speedup};
+\addlegendentry{}
 
-%\begin{figure}[H]
-%	\begin{tikzpicture}[]
-%\pgfplotsset{set layers}
-%\begin{axis}[
-%		width=0.8\textwidth,
-%		scale only axis,
-%		axis y line*=left,
-%		legend pos=north west,
-%		no markers,
-%		xlabel={Route interpolation parameter (camera position and direction)},
-%		ylabel={BVH traverse time $[ms]$},
-%		xmin = 0,
-%		xmax = 1,
-%]
-%\addplot+[black,dashed] table [x index=0,y index=7]{../stats/asianDragon_route_100.stats};
-%\addlegendentry{No optimizations}
-%
-%\addplot+[red] table [x index=0,y index=7]{../stats/asianDragon_route_100_l.stats};
-%\addlegendentry{Plane coherency}
-%
-%\addplot+[green] table [x index=0,y index=7]{../stats/asianDragon_route_100_m.stats};
-%\addlegendentry{Plane masking}
-%
-%\addplot+[blue] table [x index=0,y index=7]{../stats/asianDragon_route_100_o.stats};
-%\addlegendentry{Octant test}
-%
-%\addplot+[black] table [x index=0,y index=7]{../stats/asianDragon_route_100_olm.stats};
-%\addlegendentry{All optimizations}
-%\end{axis}
-%
-%\begin{axis}[
-%		width=0.8\textwidth,
-%		scale only axis,
-%		axis y line*=right,
-%		ylabel near ticks,
-%		yticklabel pos=right,
-%		axis x line=none,
-%		no markers,
-%		ylabel={\#\,trav. nodes},
-%		xmin = 0,
-%		xmax = 1,
-%]
-%\addplot+[opacity=0,fill=black,fill opacity=0.1] table [x index=0,y index=5]{../stats/asianDragon_route_100.stats};
-%\end{axis}
-%
-%\end{tikzpicture}
-%	\caption{Comparison of culling optimizations effectivity during camera flythrough in \emph{asian dragon} scene. \emph{MTPL} was set to 100.}
-%\label{GRAPH:dragon_route}
-%\end{figure}
+\addplot+[] table [x index=2, y index=1]{../stats/PowerPlantM.speedup};
+\addlegendentry{}
+
+\addplot+[] table [x index=2, y index=1]{../stats/City4M.speedup};
+\addlegendentry{}
+
+\addplot+[] table [x index=2, y index=1]{../stats/asianDragon.speedup};
+\addlegendentry{}
+
+\addplot+[] table [x index=2, y index=1]{../stats/vienna_cropped.speedup};
+\addlegendentry{}
+
+\addplot+[] table [x index=2, y index=1]{../stats/block_in_pompeii.high_lod_combined.speedup};
+\addlegendentry{}
+
+\addplot+[] table [x index=2, y index=1]{../stats/ten_blocks_in_pompeii.01.final.combined.speedup};
+\addlegendentry{}
+
+\end{axis}
+\end{tikzpicture}
+	\caption{}
+\label{GRAPH:}
+\end{center}
+\end{figure}
 
 Table \ref{TAB:configuration} contains the software and hardware configuration that was used for the measurments. The implementation uses a single thread, 
 
