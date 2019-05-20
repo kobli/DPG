@@ -71,6 +71,11 @@ Frustum culling options
 ============================================================
 4) application controls
 
+w,s ... camera movement forward, backward
+a,d ... camera movement left, right
+j,k ... camera movement up, down
+q,e ... camera rotation left, right
+
 r ... append node (current view) to camera route - used for recording camera flythrough route
 p ... toggle camera playback pause
 + ... increase camera speed (*2)
