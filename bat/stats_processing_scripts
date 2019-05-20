@@ -1,8 +1,8 @@
 # print stats file name + avg draw time for every view
 for file in `ls | egrep '*_[olm]*.stats'`; do echo "$file `cat "$file" |cut -d ' ' -f8 | awk '{ total += $0; count++ } END { print total/count }' -`"; done
 
-# print view characteristics
-for file in `ls | egrep '*_.stats'`; do echo "$file `cat "$file" | cut -d ' ' -f5,6,7 |tail -n 1`"; done
+# print scene characteristics
+for file in `ls | egrep '*_10000_com.stats'`; do echo "$file `cat "$file" | cut -d ' ' -f5,7 |tail -n 1`"; done
 
 # replace each sequence of 20 rows be their average (over their columns)
 for file in ../stats/*.stats; do awk -i inplace 'n<20{for(i=1;i<=NF;i++)a[i]+=$i;n++;} n==20{for(i=1;i<=NF;i++)s=s sprintf("%s ",a[i]/20); print s;s="";delete a;n=0}' "$file"; done
