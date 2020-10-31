@@ -8,6 +8,7 @@ Faculty of Electrical Engineering, CTU in Prague
 
 13. 5. 2019
 
+full report: https://github.com/kobli/DPG/blob/master/report/reportdpg.pdf
 
 ============================================================
 Contents:
@@ -17,6 +18,7 @@ Contents:
 3) application command line argument
 4) application controls
 5) supported platform and build dependencies
+6) license
 
 
 ============================================================
@@ -101,3 +103,6 @@ OpenGL 4.5 (It could probably be easily made to work on lower versions.)
 GLUT
 GLEW (tested with version 2.0.0-3)
 glm  (tested with version 0.9.8.3-3)
+
+6) license
+The project is licensed under the MIT license.
